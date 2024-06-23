@@ -1,0 +1,18 @@
+.Dictionary {
+    text-align: center;
+}
+
+.dictionary-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dictionary-item {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin: 10px;
+    width: 80%;
+    text-align: left;
+}
+  
