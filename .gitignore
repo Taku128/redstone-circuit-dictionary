@@ -1,0 +1,5 @@
+docker-compose.yml
+.build
+node_modules
+lambda.zip
+.serverless

@@ -1,0 +1,11 @@
+FROM golang:1.21.5-bullseye
+RUN go install github.com/cosmtrek/air@v1.49.0
+WORKDIR /go/src/lambda
+COPY go.mod go.sum ./
+RUN go mod download
+COPY ./ .
+ENV GOOS=linux GOARCH=amd64
+
+ADD https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/latest/download/aws-lambda-rie /usr/bin/aws-lambda-rie
+RUN chmod 755 /usr/bin/aws-lambda-rie
+CMD ["air", "-c", ".air.toml"]

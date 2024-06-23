@@ -1,0 +1,61 @@
+service: go-lambda-dynamo
+
+provider:
+  name: aws
+  region: ap-northeast-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    DYNAMODB_TABLE: ${opt:stage, self:provider.stage}-serverless-test
+  ecr:
+    images:
+      go-lambda-dynamo_example:
+        path: ./
+        file: Dockerfile
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+      Resource:
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  getDictionaryItems:
+    image:
+        name: go-lambda-dynamo_example
+    events:
+      - http:
+          path: dictionary
+          method: get
+          cors: true 
+    environment:
+      DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
+  addDictionaryItems:
+    image:
+        name: go-lambda-dynamo_example
+    events:
+      - http:
+          path: dictionary
+          method: post
+          cors: true 
+    environment:
+      DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
+
+resources:
+  Resources:
+    DynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        AttributeDefinitions:
+          - AttributeName: Number
+            AttributeType: N
+        KeySchema:
+          - AttributeName: Number
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
