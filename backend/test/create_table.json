@@ -2,13 +2,13 @@
     "TableName": "dev-serverless-test",
     "AttributeDefinitions": [
       {
-        "AttributeName": "Name",
-        "AttributeType": "S"
+        "AttributeName": "Number",
+        "AttributeType": "N"
       }
     ],
     "KeySchema": [
       {
-        "AttributeName": "Name",
+        "AttributeName": "Number",
         "KeyType": "HASH"
       }
     ],

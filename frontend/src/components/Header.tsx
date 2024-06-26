@@ -18,7 +18,7 @@ const Header = () => {
 
   return (
     <header>
-      <Link to="/" className='home-button'>/Home</Link>
+      <Link to="/" className='home-button'>ホームボタン</Link>
         <form onSubmit={handleSearchSubmit}>
             <input
             type="text"
