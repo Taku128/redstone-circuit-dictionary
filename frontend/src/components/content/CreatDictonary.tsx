@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import '../css/CreatDictonray.css'
+import '../css/CreatDictonray.css';
 
-import { CognitoUserPool } from "amazon-cognito-identity-js"
-import awsConfiguration from '../../awsConfiguration'
+import { CognitoUserPool } from 'amazon-cognito-identity-js';
+import awsConfiguration from '../../awsConfiguration';
 import Login from '../login';
 import SignOut from '../auth/SignOut';
 
 const userPool = new CognitoUserPool({
   UserPoolId: awsConfiguration.UserPoolId,
   ClientId: awsConfiguration.ClientId,
-})
+});
 
 const CreatDictonary = () => {
   const [formData, setFormData] = useState({
@@ -18,21 +18,48 @@ const CreatDictonary = () => {
     category: '',
     description: '',
     video: '',
-    word: ''
+    word: '',
   });
 
+  const [videos, setVideos] = useState<string[]>(['']);
+  const [categories, setCategories] = useState<string[]>(['']);
   const [responseMessage, setResponseMessage] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
+  };
+
+  const handleCategoryChange = (index: number, value: string) => {
+    const updatedCategories = [...categories];
+    updatedCategories[index] = value;
+    setCategories(updatedCategories);
+  };
+
+  const addCategoryInput = () => {
+    setCategories([...categories, '']);
+  };
+
+  const handleVideoChange = (index: number, value: string) => {
+    const updatedVideos = [...videos];
+    updatedVideos[index] = value;
+    setVideos(updatedVideos);
+  };
+
+  const addVideoInput = () => {
+    setVideos([...videos, '']);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const updatedFormData = {
+      ...formData,
+      category: JSON.stringify(categories.filter(category => category.trim() !== '')),
+      video: JSON.stringify(videos.filter(video => video.trim() !== '')),
+    };
     try {
       const session = await fetchAuthSession();
       const token = session.tokens;
@@ -40,28 +67,28 @@ const CreatDictonary = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(formData)
-    });
+        body: JSON.stringify(updatedFormData),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error saving data', errorText);
-      throw new Error(`Error saving data: ${errorText}`);
-    }
-    console.log('Data saved successfully');
-    setResponseMessage('Data saved successfully');
-    }catch(error){
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error saving data', errorText);
+        throw new Error(`Error saving data: ${errorText}`);
+      }
+      console.log('Data saved successfully');
+      setResponseMessage('Data saved successfully');
+    } catch (error) {
       console.error('Failed to fetch', error);
       setResponseMessage('Error: ' + error);
     }
   };
 
-  const CreatDictonary = () => {
+  const renderCreatDictonary = () => {
     return (
       <div className='creat-dictonary'>
-        <h1>Add Dictonary</h1>
+        <h1>Add Dictionary</h1>
         <form onSubmit={handleSubmit} className='creat-dictonary-form'>
           <p className='p'>用語</p>
           <input
@@ -73,14 +100,18 @@ const CreatDictonary = () => {
             onChange={handleChange}
           />
           <p className='p'>カテゴリ</p>
-          <input
-            type="text"
-            name="category"
-            placeholder="Category"
-            className="creat-dictonary-input"
-            value={formData.category}
-            onChange={handleChange}
-          />
+          {categories.map((category, index) => (
+            <div key={index} className='category-input-group'>
+              <input
+                type="text"
+                placeholder={`Category ${index + 1}`}
+                className="creat-dictonary-input"
+                value={category}
+                onChange={(e) => handleCategoryChange(index, e.target.value)}
+              />
+            </div>
+          ))}
+          <button type="button" onClick={addCategoryInput} className='creat-dictonary-button'>Add Category</button>
           <p className='p'>説明</p>
           <input
             type="text"
@@ -91,14 +122,18 @@ const CreatDictonary = () => {
             onChange={handleChange}
           />
           <p className='p'>YouTube URL</p>
-          <input
-            type="text"
-            name="video"
-            placeholder="Video"
-            className="creat-dictonary-input"
-            value={formData.video}
-            onChange={handleChange}
-          />
+          {videos.map((video, index) => (
+            <div key={index} className='video-input-group'>
+              <input
+                type="text"
+                placeholder={`Video ${index + 1}`}
+                className="creat-dictonary-input"
+                value={video}
+                onChange={(e) => handleVideoChange(index, e.target.value)}
+              />
+            </div>
+          ))}
+          <button type="button" onClick={addVideoInput} className='creat-dictonary-button'>Add Video</button>
           <button type="submit" className='creat-dictonary-button'>Save</button>
         </form>
         {responseMessage && <div className='response-message'>{responseMessage}</div>}
@@ -107,24 +142,23 @@ const CreatDictonary = () => {
   };
 
   const authentication = () => {
-    const cognitoUser = userPool.getCurrentUser()
-    // サインインユーザーがいればアプリのメイン画面へ、
-    // いなければサインアップ、検証、サインイン画面を表示する。
+    const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
       return (
         <div className="authorizedMode">
-          <SignOut/>
-          {CreatDictonary()}
+          <SignOut />
+          {renderCreatDictonary()}
         </div>
-      )
+      );
     } else {
       return (
         <div className="unauthorizedMode">
-          <Login/>
+          <Login />
         </div>
-      )
+      );
     }
-  }
+  };
+
   return (
     <div>
       {authentication()}

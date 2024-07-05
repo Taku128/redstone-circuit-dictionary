@@ -40,7 +40,7 @@
     cursor: pointer;
     align-self: center;
     text-align: center;
-    margin: 0 auto; /* Center the button horizontally */
+    margin: 5px auto; 
     display: block;
   }
   
