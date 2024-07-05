@@ -3,8 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
+	"net/url"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -121,6 +124,48 @@ func handleUpdate(svc *dynamodb.DynamoDB, request events.APIGatewayProxyRequest)
 		}, nil
 	}
 
+	var urls []string
+	err = json.Unmarshal([]byte(item.Video), &urls)
+	if err != nil {
+		fmt.Println("Error parsing JSON:", err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Headers: map[string]string{
+				"Content-Type":                "application/json",
+				"Access-Control-Allow-Origin": "*", // CORS ヘッダーを追加
+			},
+			Body: fmt.Sprint("Error parsing JSON:", err),
+		}, nil
+	}
+
+	embedURLs, err := validateAndConvertURLs(urls)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Headers: map[string]string{
+				"Content-Type":                "application/json",
+				"Access-Control-Allow-Origin": "*", // CORS ヘッダーを追加
+			},
+			Body: fmt.Sprint("Error:", err),
+		}, nil
+	}
+
+	result, err := json.Marshal(embedURLs)
+	if err != nil {
+		fmt.Println("Error converting to JSON:", err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Headers: map[string]string{
+				"Content-Type":                "application/json",
+				"Access-Control-Allow-Origin": "*", // CORS ヘッダーを追加
+			},
+			Body: fmt.Sprint("Error converting to JSON:", err),
+		}, nil
+	}
+
+	item.Video = string(result)
+
 	// Generate a UUID for the number field
 	Number := int(uuid.New().ID())
 
@@ -175,6 +220,40 @@ func handleUpdate(svc *dynamodb.DynamoDB, request events.APIGatewayProxyRequest)
 		},
 		Body: "Data created successfully",
 	}, nil
+}
+
+func validateAndConvertURLs(urls []string) ([]string, error) {
+	var result []string
+
+	for _, v := range urls {
+		u, err := url.Parse(v)
+		if err != nil || (u.Host != "www.youtube.com" && u.Host != "youtu.be") {
+			return nil, errors.New("Invalid URL: " + v)
+		}
+
+		// Check if it's already an embed URL
+		if strings.Contains(u.Path, "embed") {
+			result = append(result, v)
+			continue
+		}
+
+		// Extract the video ID and construct the embed URL
+		var videoID string
+		if u.Host == "www.youtube.com" {
+			queryParams := u.Query()
+			videoID = queryParams.Get("v")
+			if videoID == "" {
+				return nil, errors.New("Invalid YouTube URL: " + v)
+			}
+		} else if u.Host == "youtu.be" {
+			videoID = strings.TrimPrefix(u.Path, "/")
+		}
+
+		embedURL := "https://www.youtube.com/embed/" + videoID
+		result = append(result, embedURL)
+	}
+
+	return result, nil
 }
 
 func main() {

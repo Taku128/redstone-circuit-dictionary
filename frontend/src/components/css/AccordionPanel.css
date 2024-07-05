@@ -34,6 +34,7 @@
     cursor: pointer;
     display: block;
     text-align: left;
+    margin-right:10px;
   }
 
   .accordion-p{
@@ -92,3 +93,8 @@
     background-color: #0056b3;
   }
   
+  .accordion-category{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
