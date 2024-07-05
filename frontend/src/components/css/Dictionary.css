@@ -5,7 +5,7 @@
 .dictionary-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    text-align: left;
 }
 
 .dictionary-item {
@@ -16,3 +16,13 @@
     text-align: left;
 }
   
+.dictionary-list-h2 {
+    margin: 0px 10px;
+    font-size: 2em;
+    padding-left: 60px;
+    text-align: left;
+}
+
+.dictionary-list-border{
+    border-bottom: 3px solid red;
+}

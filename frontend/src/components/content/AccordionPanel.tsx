@@ -49,6 +49,7 @@ const AccordionPanel: React.FC<AccordionPanelProps> = ({ title, categories, imag
       </div>
       <div ref={contentRef} className={`accordion-content ${isOpen ? 'open' : ''}`}>
         <p className='accordion-p'>{description}</p>
+        <div className='accordion-videos'>
         {parsedImageUrls.map((video: string, index: number) => (
           <div key={index} className="accordion-video">
             {parsedImageUrls[index] && (
@@ -56,6 +57,7 @@ const AccordionPanel: React.FC<AccordionPanelProps> = ({ title, categories, imag
             )}
           </div>
         ))}
+        </div>
       </div>
     </div>
   );
