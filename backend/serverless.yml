@@ -53,9 +53,21 @@ resources:
         AttributeDefinitions:
           - AttributeName: Number
             AttributeType: N
+          - AttributeName: word
+            AttributeType: S
         KeySchema:
           - AttributeName: Number
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: word_index
+            KeySchema: 
+              - AttributeName: word
+                KeyType: HASH
+            Projection: 
+              ProjectionType: ALL            
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

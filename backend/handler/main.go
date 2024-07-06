@@ -41,7 +41,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	// Determine HTTP method
 	switch request.HTTPMethod {
 	case "GET":
-		return handleGet(svc)
+		return handleGet(svc, request.QueryStringParameters)
 	case "POST":
 		return handleUpdate(svc, request)
 	default:
@@ -56,10 +56,30 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 }
 
-func handleGet(svc *dynamodb.DynamoDB) (events.APIGatewayProxyResponse, error) {
-	result, err := svc.Scan(&dynamodb.ScanInput{
+func handleGet(svc *dynamodb.DynamoDB, queryParams map[string]string) (events.APIGatewayProxyResponse, error) {
+	var filterExpression string
+	var expressionAttributeValues map[string]*dynamodb.AttributeValue
+
+	if word, ok := queryParams["word"]; ok && word != "" {
+		filterExpression = "contains(word, :w)"
+		expressionAttributeValues = map[string]*dynamodb.AttributeValue{
+			":w": {
+				S: aws.String(word),
+			},
+		}
+	}
+
+	input := &dynamodb.ScanInput{
 		TableName: aws.String("dev-serverless-test"),
-	})
+	}
+
+	// If a filter expression is set, add it to the input
+	if filterExpression != "" {
+		input.FilterExpression = aws.String(filterExpression)
+		input.ExpressionAttributeValues = expressionAttributeValues
+	}
+
+	result, err := svc.Scan(input)
 	if err != nil {
 		log.Fatalf("Failed to scan table: %v", err)
 		return events.APIGatewayProxyResponse{
