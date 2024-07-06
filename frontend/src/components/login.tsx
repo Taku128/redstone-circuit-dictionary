@@ -29,8 +29,6 @@ const Login: React.FC = () => {
     } else {
       return (
         <div className="unauthorizedMode">
-          <SignUp />
-          <Verification />
           <SignIn />
         </div>
       )

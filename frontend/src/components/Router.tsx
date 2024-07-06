@@ -5,7 +5,6 @@ import SignUp from './auth/SignUp';
 import Verification from './auth/Verification';
 import SignIn from './auth/SignIn';
 import Home from './Home';
-import SignOut from './auth/SignOut';
 import Login from './login';
 
 const RouterComponent: React.FC = () => {
@@ -17,8 +16,7 @@ const RouterComponent: React.FC = () => {
         <Route path='/SignUp' element={<SignUp/>}/>
         <Route path='/Verification' element={<Verification/>}/>
         <Route path='/SignIn' element={<SignIn/>}/>
-        <Route path='/SignOut' element={<SignOut/>}/>
-        <Route path='/Login' element={<Login/>}/>
+        <Route path="*" element={<Home/>} />
       </Routes>
     </div>
   );

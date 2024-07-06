@@ -146,8 +146,8 @@ const CreatDictonary = () => {
     if (cognitoUser) {
       return (
         <div className="authorizedMode">
-          <SignOut />
           {renderCreatDictonary()}
+          <SignOut />
         </div>
       );
     } else {

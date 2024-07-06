@@ -1,0 +1,30 @@
+.SignOut{
+    margin-top: 30px;
+    display: grid;
+    align-items: center;
+    cursor: pointer;
+}
+
+.SignOut h1{
+    text-align: center !important;
+    color: rgb(27, 27, 27);
+}
+
+.SignOut input{
+    margin-bottom: 10px;
+    overflow: hidden;
+    min-width: 20em;
+    max-width: 40em;
+    margin:10px auto;
+}
+
+.SignOut button {
+    margin:10px auto;
+    background-color: #007bff;
+    color: white;
+    width: 8em;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
