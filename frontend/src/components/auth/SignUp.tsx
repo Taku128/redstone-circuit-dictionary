@@ -5,6 +5,7 @@ import {
   CognitoUserAttribute
 } from "amazon-cognito-identity-js"
 import awsConfiguration from '../../awsConfiguration'
+import "../css/SignUp.css"
 
 const userPool = new CognitoUserPool({
   UserPoolId: awsConfiguration.UserPoolId,
@@ -32,15 +33,16 @@ const SignUp: React.FC = () => {
       }
       setEmail('')
       setPassword('')
-      navigate('/Creat');
+      navigate('/Verification');
     })
   }
 
   return (
     <div className="SignUp">
       <h1 style={{ textAlign: 'left' }}>SignUp</h1>
+      <p>※パスワードは他のアカウントとは別のものを使用してください!</p>
       <input type="text" placeholder="email" onChange={changedEmailHandler} />
-      <input type="text" placeholder="password" onChange={changedPasswordHandler} />
+      <input type="password" placeholder="password" onChange={changedPasswordHandler} />
       <button onClick={signUp}>SignUp</button>
     </div>
   )

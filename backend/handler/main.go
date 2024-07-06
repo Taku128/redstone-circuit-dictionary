@@ -166,6 +166,10 @@ func handleUpdate(svc *dynamodb.DynamoDB, request events.APIGatewayProxyRequest)
 
 	item.Video = string(result)
 
+	if item.Video == "" {
+		item.Video = "[]"
+	}
+
 	// Generate a UUID for the number field
 	Number := int(uuid.New().ID())
 

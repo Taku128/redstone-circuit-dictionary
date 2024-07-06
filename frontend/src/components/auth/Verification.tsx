@@ -5,6 +5,7 @@ import {
   CognitoUser
 } from "amazon-cognito-identity-js"
 import awsConfiguration from '../../awsConfiguration'
+import "../css/Verification.css"
 
 const userPool = new CognitoUserPool({
   UserPoolId: awsConfiguration.UserPoolId,
@@ -37,6 +38,7 @@ const Verification: React.FC = () => {
   return (
     <div className="Verification">
       <h1>Authenticate</h1>
+      <p>emailに検証コードを送りました。届いた検証コードを以下に入力してください</p>
       <input type="text" placeholder="verification code" onChange={changedVerificationCodeHandler} />
       <input type="text" placeholder='email' onChange={changedEmailHandler} />
       <button onClick={verifyCode}>Authenticate</button>

@@ -2,6 +2,7 @@ import React from 'react'
 import { useLocation } from 'react-router-dom';
 import { CognitoUserPool } from "amazon-cognito-identity-js"
 import awsConfiguration from '../../awsConfiguration'
+import "../css/SignOut.css"
 
 const userPool = new CognitoUserPool({
   UserPoolId: awsConfiguration.UserPoolId,

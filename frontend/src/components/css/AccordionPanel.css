@@ -3,7 +3,9 @@
     border-radius: 20px;
     margin-bottom: 10px;
     overflow: hidden;
-    width: 40em;
+    width: 100%;
+    max-width: 40em;
+    position: relative;
   }
   
   .accordion-header {
@@ -27,7 +29,7 @@
   .category-je{
     margin-top: 5px;
     color: white;
-    background-color: rgb(255, 64, 64);
+    background-color: rgb(61, 168, 93);
     padding: 2px 12px;
     border-radius: 20px;
     font-size: 0.8em;
@@ -41,6 +43,7 @@
     margin: 10px;
     text-align: left;
     font-size: 1.2em;
+    font-family: "Noto Sans JP", sans-serif;
   }
 
   .accordion-header h2 {
@@ -100,4 +103,6 @@
   }
 
   .accordion-videos{
+    text-align: center;
+    display: grid;
   }

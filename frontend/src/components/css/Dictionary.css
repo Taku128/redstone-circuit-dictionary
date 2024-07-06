@@ -17,12 +17,14 @@
 }
   
 .dictionary-list-h2 {
-    margin: 0px 10px;
+    margin-top: 10px;
+    padding: 0.8rem 0;
+    margin-bottom: 0.2rem;
+    background-image: linear-gradient(90deg, #d73928 0 25%, #8c0100 25%);
+    background-repeat: no-repeat;
+    background-size: 100% 10%;
+    background-position: bottom;
+    color: #323232;
+    font-weight: bold;
     font-size: 2em;
-    padding-left: 60px;
-    text-align: left;
-}
-
-.dictionary-list-border{
-    border-bottom: 3px solid red;
 }

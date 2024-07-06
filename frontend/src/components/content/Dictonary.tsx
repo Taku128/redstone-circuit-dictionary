@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import DictionaryItem, { DictionaryItemProps } from './DictonaryItem';
+import DictionaryItem, { DictionaryItemProps } from './DictionaryItem';
+import Separator from './Separator';
 import '../css/Dictionary.css';
 
 const Dictionary: React.FC = () => {
@@ -33,12 +34,14 @@ const Dictionary: React.FC = () => {
   return (
     <div className="Dictionary">
       <div className="dictionary-list">
-        {Object.keys(groupedDictionary).map((letter) => (
+        {Object.keys(groupedDictionary).map((letter, index) => (
           <React.Fragment key={letter}>
             <h2 className='dictionary-list-h2'>{letter}</h2>
-            <div className='dictionary-list-border'></div>
-            {groupedDictionary[letter].map((item, index) => (
-              <DictionaryItem key={index} item={item} />
+            {groupedDictionary[letter].map((item, idx) => (
+              <div>
+                {idx > 0 && <Separator />}
+                <DictionaryItem key={idx} item={item} />
+              </div>
             ))}
           </React.Fragment>
         ))}
