@@ -4,7 +4,6 @@ import AccordionPanel from './AccordionPanel';
 import '../css/DictionaryItem.css';
 
 export interface DictionaryItemProps {
-  Number: number;
   word: string;
   description: string;
   category: string; // String representation of an array
@@ -29,7 +28,6 @@ const DictionaryItem: React.FC<DictionaryItemComponentProps> = ({ item }) => {
 
 DictionaryItem.propTypes = {
   item: PropTypes.shape({
-    Number: PropTypes.number.isRequired,
     word: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,

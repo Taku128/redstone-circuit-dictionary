@@ -5,6 +5,7 @@ import SignUp from './auth/SignUp';
 import Verification from './auth/Verification';
 import SignIn from './auth/SignIn';
 import Home from './Home';
+import Login from './login';
 
 const RouterComponent: React.FC = () => {
   return (
