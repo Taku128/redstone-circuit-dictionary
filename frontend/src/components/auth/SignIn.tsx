@@ -1,6 +1,5 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import {
   CognitoUserPool,
   CognitoUser,
@@ -17,14 +16,16 @@ const userPool = new CognitoUserPool({
 const SignIn: React.FC = () => {
   const [email, setEmail] = React.useState<string>('')
   const [password, setPassword] = React.useState<string>('')
-  const changedEmailHaldler = (e: any) => setEmail(e.target.value)
-  const changedPasswordHandler = (e: any) => setPassword(e.target.value)
+  const [error, setError] = React.useState<string>('')
   const location = useLocation();
+
+  const changedEmailHandler = (e: any) => setEmail(e.target.value)
+  const changedPasswordHandler = (e: any) => setPassword(e.target.value)
 
   const signIn = () => {
     const authenticationDetails = new AuthenticationDetails({
-      Username : email,
-      Password : password
+      Username: email,
+      Password: password
     })
     const cognitoUser = new CognitoUser({
       Username: email,
@@ -38,19 +39,21 @@ const SignIn: React.FC = () => {
         console.log('AccessToken: ' + accessToken)
         setEmail('')
         setPassword('')
+        setError('')
         window.location.href = location.pathname;
       },
       onFailure: (err) => {
-        console.error(err)
+        setError(err.message || JSON.stringify(err))
       }
     })
   }
 
   return (
     <div className="SignIn">
-      <h1>SingIn</h1>
-      <input type="text" placeholder='email' onChange={changedEmailHaldler}/>
-      <input type="password" placeholder='password' onChange={changedPasswordHandler}/>
+      <h1>SignIn</h1>
+      <input type="text" placeholder='email' onChange={changedEmailHandler} />
+      <input type="password" placeholder='password' onChange={changedPasswordHandler} />
+      {error && <div className="error">{error}</div>}
       <button onClick={signIn}>Sign In</button>
       <p>アカウント作成は以下から</p>
       <Link className='link-button' to="/SignUp">SignUp</Link>

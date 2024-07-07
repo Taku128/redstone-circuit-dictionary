@@ -7,7 +7,7 @@ const Home: React.FC = () => {
         <div className='home'>
             <div className="title-text-center">
             <h1 className="font-ubuntu-medium">
-                Redstone Circuit Dictonary
+                Redstone Circuit Dictionary
             </h1>
             <p>
                 <span>ここはMinecraftのレッドストーン回路用語を</span><span>集めた場所</span><br />

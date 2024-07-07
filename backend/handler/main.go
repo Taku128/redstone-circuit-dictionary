@@ -145,49 +145,47 @@ func handleUpdate(svc *dynamodb.DynamoDB, request events.APIGatewayProxyRequest)
 	}
 
 	var urls []string
-	err = json.Unmarshal([]byte(item.Video), &urls)
-	if err != nil {
-		fmt.Println("Error parsing JSON:", err)
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Headers: map[string]string{
-				"Content-Type":                "application/json",
-				"Access-Control-Allow-Origin": "*", // CORS ヘッダーを追加
-			},
-			Body: fmt.Sprint("Error parsing JSON:", err),
-		}, nil
-	}
+	if item.Video != "[]" {
+		err = json.Unmarshal([]byte(item.Video), &urls)
+		if err != nil {
+			fmt.Println("Error parsing JSON:", err)
+			return events.APIGatewayProxyResponse{
+				StatusCode: 400,
+				Headers: map[string]string{
+					"Content-Type":                "application/json",
+					"Access-Control-Allow-Origin": "*", // CORS ヘッダーを追加
+				},
+				Body: fmt.Sprint("Error parsing JSON:", err),
+			}, nil
+		}
 
-	embedURLs, err := validateAndConvertURLs(urls)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Headers: map[string]string{
-				"Content-Type":                "application/json",
-				"Access-Control-Allow-Origin": "*", // CORS ヘッダーを追加
-			},
-			Body: fmt.Sprint("Error:", err),
-		}, nil
-	}
+		embedURLs, err := validateAndConvertURLs(urls)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return events.APIGatewayProxyResponse{
+				StatusCode: 400,
+				Headers: map[string]string{
+					"Content-Type":                "application/json",
+					"Access-Control-Allow-Origin": "*", // CORS ヘッダーを追加
+				},
+				Body: fmt.Sprint("Error:", err),
+			}, nil
+		}
 
-	result, err := json.Marshal(embedURLs)
-	if err != nil {
-		fmt.Println("Error converting to JSON:", err)
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Headers: map[string]string{
-				"Content-Type":                "application/json",
-				"Access-Control-Allow-Origin": "*", // CORS ヘッダーを追加
-			},
-			Body: fmt.Sprint("Error converting to JSON:", err),
-		}, nil
-	}
+		result, err := json.Marshal(embedURLs)
+		if err != nil {
+			fmt.Println("Error converting to JSON:", err)
+			return events.APIGatewayProxyResponse{
+				StatusCode: 400,
+				Headers: map[string]string{
+					"Content-Type":                "application/json",
+					"Access-Control-Allow-Origin": "*", // CORS ヘッダーを追加
+				},
+				Body: fmt.Sprint("Error converting to JSON:", err),
+			}, nil
+		}
 
-	item.Video = string(result)
-
-	if item.Video == "" {
-		item.Video = "[]"
+		item.Video = string(result)
 	}
 
 	// Generate a UUID for the number field

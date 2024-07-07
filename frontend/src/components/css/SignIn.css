@@ -41,3 +41,7 @@
     border-radius: 4px;
     cursor: pointer;
 }
+
+.link-button:hover{
+    background-color: #294cc2;
+}

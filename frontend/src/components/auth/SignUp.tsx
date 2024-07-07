@@ -15,6 +15,7 @@ const userPool = new CognitoUserPool({
 const SignUp: React.FC = () => {
   const [email, setEmail] = React.useState<string>('')
   const [password, setPassword] = React.useState<string>('')
+  const [error, setError] = React.useState<string>('')
   const navigate = useNavigate();
 
   const changedEmailHandler = (event: any) => setEmail(event.target.value)
@@ -28,9 +29,10 @@ const SignUp: React.FC = () => {
     ]
     userPool.signUp(email, password, attributeList, [], (err, result) => {
       if (err) {
-        console.error(err)
+        setError(err.message || JSON.stringify(err))
         return
       }
+      setError('')
       setEmail('')
       setPassword('')
       navigate('/Verification');
@@ -43,6 +45,7 @@ const SignUp: React.FC = () => {
       <p>※パスワードは他のアカウントとは別のものを使用してください!</p>
       <input type="text" placeholder="email" onChange={changedEmailHandler} />
       <input type="password" placeholder="password" onChange={changedPasswordHandler} />
+      {error && <div className="error">{error}</div>}
       <button onClick={signUp}>SignUp</button>
     </div>
   )

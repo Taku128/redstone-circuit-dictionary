@@ -15,9 +15,11 @@ const userPool = new CognitoUserPool({
 const Verification: React.FC = () => {
   const [email, setEmail] = React.useState<string>('')
   const [verificationCode, setVerificationCode] = React.useState<string>('')
+  const [error, setError] = React.useState<string>('')
+  const navigate = useNavigate();
+
   const changedEmailHandler = (event: any) => setEmail(event.target.value)
   const changedVerificationCodeHandler = (event: any) => setVerificationCode(event.target.value)
-  const navigate = useNavigate();
 
   const verifyCode = () => {
     const cognitoUser = new CognitoUser({
@@ -26,21 +28,24 @@ const Verification: React.FC = () => {
     })
     cognitoUser.confirmRegistration(verificationCode, true, (err: any) => {
       if (err) {
-        console.log(err)
+        setError(err.message || JSON.stringify(err))
         return
       }
       console.log('verification succeeded')
       setEmail('')
       setVerificationCode('')
-      navigate('/Creat');
+      setError('')
+      navigate('/Create');
     })
   }
+
   return (
     <div className="Verification">
       <h1>Authenticate</h1>
       <p>emailに検証コードを送りました。届いた検証コードを以下に入力してください</p>
       <input type="text" placeholder="verification code" onChange={changedVerificationCodeHandler} />
       <input type="text" placeholder='email' onChange={changedEmailHandler} />
+      {error && <div className="error">{error}</div>}
       <button onClick={verifyCode}>Authenticate</button>
     </div>
   )

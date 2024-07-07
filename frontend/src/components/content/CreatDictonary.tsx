@@ -85,6 +85,18 @@ const CreatDictonary = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      number: '',
+      category: '',
+      description: '',
+      video: '',
+      word: '',
+    });
+    setCategories(['']);
+    setVideos(['']);
+  };
+
   const renderCreatDictonary = () => {
     return (
       <div className='creat-dictonary'>
@@ -134,7 +146,10 @@ const CreatDictonary = () => {
             </div>
           ))}
           <button type="button" onClick={addVideoInput} className='creat-dictonary-button'>Add Video</button>
-          <button type="submit" className='creat-dictonary-button'>Save</button>
+          <div className='saveOrReset'>
+            <button type="submit" className='creat-dictonary-button'>Save</button>
+            <button type="button" onClick={resetForm} className='creat-dictonary-button'>Reset</button>
+          </div>
         </form>
         {responseMessage && <div className='response-message'>{responseMessage}</div>}
       </div>
