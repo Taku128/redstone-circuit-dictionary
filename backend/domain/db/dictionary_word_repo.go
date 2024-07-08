@@ -48,14 +48,14 @@ func List() (*[]DictionaryWord, error) {
 }
 
 // 指定したwordを含むDictionaryWordを取得する
-func SearchByContainedWord(queryParams map[string]string) (*[]DictionaryWord, error) {
+func SearchByContainedWord(word string) (*[]DictionaryWord, error) {
 	var filterExpression string
 	var expressionAttributeValues map[string]*dynamodb.AttributeValue
 
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
 
-	if word, ok := queryParams["word"]; ok && word != "" {
+	if word != "" {
 		filterExpression = "contains(word, :w)"
 		expressionAttributeValues = map[string]*dynamodb.AttributeValue{
 			":w": {
@@ -95,8 +95,6 @@ func Create(dictionaryWord DictionaryWord) error {
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
 
-	number := int(uuid.New().ID())
-
 	update := expression.Set(expression.Name("word"), expression.Value(dictionaryWord.Word))
 	update.Set(expression.Name("description"), expression.Value(dictionaryWord.Description))
 	update.Set(expression.Name("category"), expression.Value(dictionaryWord.Category))
@@ -115,7 +113,7 @@ func Create(dictionaryWord DictionaryWord) error {
 		TableName: aws.String(tableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"Number": {
-				N: aws.String(fmt.Sprintf("%d", number)),
+				N: aws.String(fmt.Sprintf("%d", dictionaryWord.Number)),
 			},
 		},
 		ExpressionAttributeNames:  expr.Names(),
