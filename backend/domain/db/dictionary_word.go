@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"net/http"
 	"net/url"
 	"strings"
 )
@@ -25,13 +26,13 @@ func IsContainedEmbed(u *url.URL) bool {
 }
 
 // URLのバリデーション
-func validateAndConvertURLs(urls []string) ([]string, error) {
+func ValidateAndConvertURLs(urls []string) ([]string, int, error) {
 	var result []string
 
 	for _, v := range urls {
 		u, err := url.Parse(v)
 		if err != nil || IsYoutubeURL(u) {
-			return nil, errors.New("Invalid URL: " + v)
+			return nil, http.StatusBadRequest, errors.New("Invalid URL: " + v)
 		}
 
 		if IsContainedEmbed(u) {
@@ -45,7 +46,7 @@ func validateAndConvertURLs(urls []string) ([]string, error) {
 			queryParams := u.Query()
 			videoID = queryParams.Get("v")
 			if videoID == "" {
-				return nil, errors.New("Invalid YouTube URL: " + v)
+				return nil, http.StatusBadRequest, errors.New("Invalid YouTube URL: " + v)
 			}
 		} else if u.Host == "youtu.be" {
 			videoID = strings.TrimPrefix(u.Path, "/")
@@ -55,5 +56,5 @@ func validateAndConvertURLs(urls []string) ([]string, error) {
 		result = append(result, embedURL)
 	}
 
-	return result, nil
+	return result, http.StatusOK, nil
 }

@@ -1,12 +1,21 @@
 package usecase
 
-func GetDictionaryWord(ctx context.Context) ([]*DictionaryWord, error) {
-	var urls []string
+import (
+	"context"
+	"net/http"
 
-	dictionaryWords, err := db.List()
+	"example.com/hello-world/domain/db"
+)
+
+func GetDictionaryWord(ctx context.Context, word string) (*[]db.DictionaryWord, int, error) {
+	dictionaryWordRepo, statusCode, err := db.NewDictionaryWordRepo()
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
+	}
+	dictionaryWords, statusCode, err := dictionaryWordRepo.List(word)
+	if err != nil {
+		return nil, statusCode, err
 	}
 
-	return dictionaryWords, nil
+	return dictionaryWords, http.StatusOK, nil
 }
