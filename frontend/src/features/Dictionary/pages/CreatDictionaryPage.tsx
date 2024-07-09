@@ -1,18 +1,20 @@
+// pages/CreateDictionary.tsx
+
 import React, { useState } from 'react';
-import { fetchAuthSession } from 'aws-amplify/auth';
-import '../css/CreatDictonray.css';
+import '../../../css/CreatDictonray.css';
 
 import { CognitoUserPool } from 'amazon-cognito-identity-js';
-import awsConfiguration from '../../awsConfiguration';
-import Login from '../login';
-import SignOut from '../auth/SignOut';
+import awsConfiguration from '../../../awsConfiguration';
+import Login from '../../Auth/components/Login';
+import SignOut from '../../Auth/pages/SignOut/SignOutPage';
+import UseFetchAuthSession from '../hooks/useFetchAuthSession';
 
 const userPool = new CognitoUserPool({
   UserPoolId: awsConfiguration.UserPoolId,
   ClientId: awsConfiguration.ClientId,
 });
 
-const CreatDictonary = () => {
+const CreateDictionary = () => {
   const [formData, setFormData] = useState({
     number: '',
     category: '',
@@ -61,9 +63,8 @@ const CreatDictonary = () => {
       video: JSON.stringify(videos.filter(video => video.trim() !== '')),
     };
     try {
-      const session = await fetchAuthSession();
-      const token = session.tokens;
-      const response = await fetch('https://u4dokqntp1.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary', {
+      const token = await UseFetchAuthSession();
+      const response = await fetch('', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,39 +98,39 @@ const CreatDictonary = () => {
     setVideos(['']);
   };
 
-  const renderCreatDictonary = () => {
+  const renderCreateDictionary = () => {
     return (
-      <div className='creat-dictonary'>
+      <div className='create-dictionary'>
         <h1>Add Dictionary</h1>
-        <form onSubmit={handleSubmit} className='creat-dictonary-form'>
-          <p className='p'>用語</p>
+        <form onSubmit={handleSubmit} className='create-dictionary-form'>
+          <p className='p'>Word</p>
           <input
             type="text"
             name="word"
             placeholder="Word"
-            className="creat-dictonary-input"
+            className="create-dictionary-input"
             value={formData.word}
             onChange={handleChange}
           />
-          <p className='p'>カテゴリ</p>
+          <p className='p'>Category</p>
           {categories.map((category, index) => (
             <div key={index} className='category-input-group'>
               <input
                 type="text"
                 placeholder={`Category ${index + 1}`}
-                className="creat-dictonary-input"
+                className="create-dictionary-input"
                 value={category}
                 onChange={(e) => handleCategoryChange(index, e.target.value)}
               />
             </div>
           ))}
-          <button type="button" onClick={addCategoryInput} className='creat-dictonary-button'>Add Category</button>
-          <p className='p'>説明</p>
+          <button type="button" onClick={addCategoryInput} className='create-dictionary-button'>Add Category</button>
+          <p className='p'>Description</p>
           <input
             type="text"
             name="description"
             placeholder="Description"
-            className="creat-dictonary-input"
+            className="create-dictionary-input"
             value={formData.description}
             onChange={handleChange}
           />
@@ -139,16 +140,16 @@ const CreatDictonary = () => {
               <input
                 type="text"
                 placeholder={`Video ${index + 1}`}
-                className="creat-dictonary-input"
+                className="create-dictionary-input"
                 value={video}
                 onChange={(e) => handleVideoChange(index, e.target.value)}
               />
             </div>
           ))}
-          <button type="button" onClick={addVideoInput} className='creat-dictonary-button'>Add Video</button>
+          <button type="button" onClick={addVideoInput} className='create-dictionary-button'>Add Video</button>
           <div className='saveOrReset'>
-            <button type="submit" className='creat-dictonary-button'>Save</button>
-            <button type="button" onClick={resetForm} className='creat-dictonary-button'>Reset</button>
+            <button type="submit" className='create-dictionary-button'>Save</button>
+            <button type="button" onClick={resetForm} className='create-dictionary-button'>Reset</button>
           </div>
         </form>
         {responseMessage && <div className='response-message'>{responseMessage}</div>}
@@ -161,7 +162,7 @@ const CreatDictonary = () => {
     if (cognitoUser) {
       return (
         <div className="authorizedMode">
-          {renderCreatDictonary()}
+          {renderCreateDictionary()}
           <SignOut />
         </div>
       );
@@ -181,4 +182,4 @@ const CreatDictonary = () => {
   );
 };
 
-export default CreatDictonary;
+export default CreateDictionary;

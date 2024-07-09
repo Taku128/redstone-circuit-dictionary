@@ -1,8 +1,8 @@
 import React from 'react';
-import Dictionary from './content/Dictonary';
-import './css/Home.css'
+import Dictionary from '../../Dictionary/components/Dictionary';
+import './../../../css/Home.css'
 
-const Home: React.FC = () => {
+const DictionaryPage: React.FC = () => {
     return (
         <div className='home'>
             <div className="title-text-center">
@@ -19,4 +19,4 @@ const Home: React.FC = () => {
     );
 };
 
-export default Home
+export default DictionaryPage

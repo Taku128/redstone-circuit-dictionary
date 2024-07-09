@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from "react-router-dom";
-import './css/Header.css';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Header = () => {
+const useSearch = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const navigate = useNavigate();
 
@@ -33,21 +32,11 @@ const Header = () => {
     }
   };
 
-  return (
-    <header>
-      <Link to="/" className='home-button'>ホームボタン</Link>
-      <form onSubmit={handleSearchSubmit}>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          placeholder="Search..."
-        />
-        <button type="submit" className='search-button'>Search</button>
-      </form>
-      <Link to="/Creat" className='home-button'>新しく投稿する</Link>
-    </header>
-  );
+  return {
+    searchQuery,
+    handleSearchChange,
+    handleSearchSubmit,
+  };
 };
 
-export default Header;
+export default useSearch;
