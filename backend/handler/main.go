@@ -6,18 +6,16 @@ import (
 	"fmt"
 	"net/http"
 
-	"example.com/hello-world/usecase"
-	"example.com/hello-world/usecase/input"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func CreateResponse(statusCode int, body string) events.APIGatewayProxyResponse {
+func createResponse(statusCode int, body string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: statusCode,
 		Headers: map[string]string{
 			"Content-Type":                "application/json",
-			"Access-Control-Allow-Origin": "*", // CORS header
+			"Access-Control-Allow-Origin": "*",
 		},
 		Body: body,
 	}
@@ -25,7 +23,6 @@ func CreateResponse(statusCode int, body string) events.APIGatewayProxyResponse 
 
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if request.HTTPMethod == "OPTIONS" {
-		// Preflight request
 		return events.APIGatewayProxyResponse{
 			StatusCode: 200,
 			Headers: map[string]string{
@@ -38,40 +35,37 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}, nil
 	}
 
-	var dictionaryWord input.NotNumberDictionaryWord
+	var actionType string
+
 	if request.Body != "" {
-		err := json.Unmarshal([]byte(request.Body), &dictionaryWord)
+		bodyData := struct {
+			ActionType string `json:"action_type"`
+		}{}
+		err := json.Unmarshal([]byte(request.Body), &bodyData)
 		if err != nil {
-			return CreateResponse(http.StatusBadRequest, fmt.Errorf("bad request: %v", err).Error()), nil
+			return createResponse(http.StatusBadRequest, fmt.Errorf("bad request: %v", err).Error()), nil
+		}
+		actionType = bodyData.ActionType
+	}
+
+	// GETはBodyがないのでQueryパラメータを使う
+	if request.HTTPMethod == http.MethodGet {
+		result, ok := request.QueryStringParameters["action_type"]
+		if !ok {
+			actionType = ""
+		} else {
+			actionType = result
 		}
 	}
 
-	switch request.HTTPMethod {
-	case "GET":
-		word, ok := request.QueryStringParameters["word"]
-		if !ok {
-			word = ""
-		}
-		getDictionaryWord, statusCode, err := usecase.GetDictionaryWord(ctx, word)
-		if err != nil {
-			return CreateResponse(statusCode, err.Error()), err
-		}
-		response, err := json.Marshal(getDictionaryWord)
-		if err != nil {
-			return CreateResponse(http.StatusBadRequest, fmt.Errorf("failed to marshal dictionary word: %v", err).Error()), err
-		}
-		return CreateResponse(statusCode, string(response)), err
-
-	case "POST":
-		statusCode, err := usecase.CreateDictionaryWord(ctx, dictionaryWord)
-		if err != nil {
-			return CreateResponse(statusCode, err.Error()), nil
-		}
-		return CreateResponse(statusCode, "Data created successfully"), nil
+	switch actionType {
+	case "dictionary_word":
+		return dictionaryWord(ctx, request)
 
 	default:
-		return CreateResponse(http.StatusMethodNotAllowed, "Method Not Allowed"), nil
+		return createResponse(http.StatusBadRequest, "Invalid action_type"), nil
 	}
+
 }
 
 func main() {

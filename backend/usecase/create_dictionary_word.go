@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"example.com/hello-world/domain/db"
 	"example.com/hello-world/usecase/input"
 	"github.com/google/uuid"
 )
 
-func CreateDictionaryWord(ctx context.Context, input input.NotNumberDictionaryWord) (int, error) {
+func CreateDictionaryWord(ctx context.Context, input input.DictionaryWord) (int, error) {
 	var urls []string
 
 	// 文字列から配列に置き換える
@@ -26,6 +27,10 @@ func CreateDictionaryWord(ctx context.Context, input input.NotNumberDictionaryWo
 	embedURLs, statusCode, err := db.ValidateAndConvertURLs(urls)
 	if err != nil {
 		return statusCode, err
+	}
+
+	if input.Poster == "" || input.CreatedAt.IsZero() {
+		return http.StatusBadRequest, fmt.Errorf("invalid dictionary word")
 	}
 
 	// 配列から文字列に置き換える
@@ -50,6 +55,8 @@ func CreateDictionaryWord(ctx context.Context, input input.NotNumberDictionaryWo
 		Description: input.Description,
 		Category:    input.Category,
 		Video:       input.Video,
+		Poster:      input.Poster,
+		CreatedAt:   input.CreatedAt.Format(time.RFC3339),
 	}
 
 	// dbに保存
@@ -57,7 +64,7 @@ func CreateDictionaryWord(ctx context.Context, input input.NotNumberDictionaryWo
 	if err != nil {
 		return statusCode, nil
 	}
-	statusCode, err = dictionaryWordRepo.CreatOrUpdate(*createDictionaryWord)
+	statusCode, err = dictionaryWordRepo.CreateOrUpdate(*createDictionaryWord)
 	if err != nil {
 		return statusCode, nil
 	}

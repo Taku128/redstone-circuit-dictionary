@@ -8,6 +8,8 @@ export interface DictionaryItemProps {
   description: string;
   category: string; 
   video: string; 
+  poster: string;
+  created_at: string;
 }
 
 interface DictionaryItemComponentProps {

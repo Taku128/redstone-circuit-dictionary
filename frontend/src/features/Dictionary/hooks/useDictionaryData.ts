@@ -6,6 +6,8 @@ import { DictionaryItemProps } from '../components/DictionaryItem';
 const useDictionaryData = () => {
   const location = useLocation(); 
   const [dictionary, setDictionary] = useState<DictionaryItemProps[]>([]);
+  const action = "get_dictionary_word";
+  const actionType = "dictionary_word";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -14,7 +16,7 @@ const useDictionaryData = () => {
             setDictionary(searchResults);
         } else {
             try {
-                const response = await axios.get<DictionaryItemProps[]>('https://u4dokqntp1.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary'); // APIのURLをここに記載
+                const response = await axios.get<DictionaryItemProps[]>(`https://u4dokqntp1.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary/?action=${action}&action_type=${actionType}`);
                 const sortedData = response.data.sort((a, b) => a.word.localeCompare(b.word));
                 setDictionary(sortedData);
             } catch (error) {

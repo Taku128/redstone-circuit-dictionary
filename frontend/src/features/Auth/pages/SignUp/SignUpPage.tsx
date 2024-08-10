@@ -50,7 +50,7 @@ export default function SignIn() {
         </div>
         {error && <div className="error">{error}</div>}
         <button type="submit">サインアップ</button>
-        <Link to="/Creat" className='SignUp-button'>ログイン画面に戻る</Link>
+        <Link to="/Create" className='SignUp-button'>ログイン画面に戻る</Link>
       </form>
     </div> 
   )

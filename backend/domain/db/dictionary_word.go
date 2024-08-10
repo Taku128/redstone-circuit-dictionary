@@ -13,6 +13,8 @@ type DictionaryWord struct {
 	Description string `json:"description"`
 	Category    string `json:"category"`
 	Video       string `json:"video"`
+	Poster      string `json:"poster"`
+	CreatedAt   string `json:"created_at"`
 }
 
 // YoutubeのURLかどうかを判別する関数

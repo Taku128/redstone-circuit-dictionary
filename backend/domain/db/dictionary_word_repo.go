@@ -61,7 +61,7 @@ func (r *DictionaryWordRepo) List(word string) (*[]DictionaryWord, int, error) {
 }
 
 // DictionaryWordの項目を作成、編集
-func (r *DictionaryWordRepo) CreatOrUpdate(dictionaryWord DictionaryWord) (int, error) {
+func (r *DictionaryWordRepo) CreateOrUpdate(dictionaryWord DictionaryWord) (int, error) {
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
 
@@ -69,6 +69,8 @@ func (r *DictionaryWordRepo) CreatOrUpdate(dictionaryWord DictionaryWord) (int, 
 	update.Set(expression.Name("description"), expression.Value(dictionaryWord.Description))
 	update.Set(expression.Name("category"), expression.Value(dictionaryWord.Category))
 	update.Set(expression.Name("video"), expression.Value(dictionaryWord.Video))
+	update.Set(expression.Name("poster"), expression.Value(dictionaryWord.Poster))
+	update.Set(expression.Name("created_at"), expression.Value(dictionaryWord.CreatedAt))
 
 	expr, err := expression.NewBuilder().WithUpdate(update).Build()
 	if err != nil {
