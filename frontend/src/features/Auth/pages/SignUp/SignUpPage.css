@@ -1,4 +1,4 @@
-.login-container {
+.signup-container {
     max-width: 450px;
     margin: 20px auto;
     padding: 20px;
@@ -7,13 +7,13 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.login-container form{
+.signup-container form{
   display: grid;
 }
 
-.login-container h1{
-  text-align: center;
+.signup-container h1{
   color: black;
+  text-align: center;
 }
 
 .SignUp-button{

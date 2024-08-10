@@ -1,43 +1,56 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
-import useSignIn from '../../hooks/useSignIn';
-import SignInForm from '../../components/SignInForm';
-import "./SignInPage.css";
+import type { FormEvent } from "react"
+import { signIn } from "aws-amplify/auth"
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import "./SignInPage.css"
 
-const SignIn: React.FC = () => {
-  const {
-    email,
-    password,
-    newPassword,
-    showNewPassword,
-    error,
-    setEmail,
-    setPassword,
-    setNewPassword,
-    signIn,
-    handleNewPassword,
-  } = useSignIn();
-  
-  const location = useLocation();
+interface SignInFormElements extends HTMLFormControlsCollection {
+  username: HTMLInputElement
+  password: HTMLInputElement
+}
 
-  const changedEmailHandler = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
-  const changedPasswordHandler = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
-  const changedNewPasswordHandler = (e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value);
+interface SignInForm extends HTMLFormElement {
+  readonly elements: SignInFormElements
+}
+
+export default function SignIn() {
+  const navigate = useNavigate();
+  const [error, setError] = useState<string>('');
+  async function handleSubmit(event: FormEvent<SignInForm>) {
+    event.preventDefault()
+    const form = event.currentTarget
+    try {
+      await signIn({
+        username: form.elements.username.value,
+        password: form.elements.password.value,
+      })
+      setError('');
+      navigate('/');
+    } catch(err){
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+  }
 
   return (
-    <SignInForm
-      email={email}
-      password={password}
-      newPassword={newPassword}
-      showNewPassword={showNewPassword}
-      error={error}
-      onEmailChange={changedEmailHandler}
-      onPasswordChange={changedPasswordHandler}
-      onNewPasswordChange={changedNewPasswordHandler}
-      onSignIn={() => signIn(location.pathname)}
-      onSetNewPassword={() => handleNewPassword(location.pathname)}
-    />
-  );
-};
-
-export default SignIn;
+    <div className="login-container">
+      <h1>ログイン</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="username">ユーザー名</label>
+          <input type="text" id="username" name="username" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">パスワード</label>
+          <input type="password" id="password" name="password" />
+        </div>
+        {error && <div className="error">{error}</div>}
+        <button type="submit">ログイン</button>
+        <Link to="/SignUp" className='SignUp-button'>サインアップへ</Link>
+      </form>
+    </div> 
+  )
+}

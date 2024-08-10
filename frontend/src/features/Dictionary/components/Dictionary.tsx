@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import useDictionaryData from '../hooks/useDictionaryData';
 import DictionaryItem, { DictionaryItemProps } from './DictionaryItem';
 import Separator from './Separator';
-import '../../../css/Dictionary.css';
+import './Dictionary.css';
 
 const Dictionary: React.FC = () => {
     const dictionary = useDictionaryData();
     const [groupedDictionary, setGroupedDictionary] = useState<{ [key: string]: DictionaryItemProps[] }>({});
   
     useEffect(() => {
-      if (dictionary.length === 0) return; // 辞書が空の場合は処理をスキップ
+      if (dictionary.length === 0) return;
 
       console.log(dictionary)
   
@@ -23,7 +23,7 @@ const Dictionary: React.FC = () => {
       }, {} as { [key: string]: DictionaryItemProps[] });
   
       setGroupedDictionary(groupedData);
-    }, [dictionary]); // 辞書データが変更されたときにのみ実行される
+    }, [dictionary]);
   
     return (
       <div className="Dictionary">

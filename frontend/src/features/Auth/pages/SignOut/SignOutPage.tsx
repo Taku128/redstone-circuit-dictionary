@@ -1,8 +1,16 @@
-import React from 'react';
-import SignOutButton from '../../components/SignOutButton';
+import { signOut } from "aws-amplify/auth"
+import { useNavigate } from 'react-router-dom';
 
-const SignOut: React.FC = () => {
-  return <SignOutButton />;
-};
+export default function SignOut() {
+  const navigate = useNavigate();
+  async function handleSignOut() {
+    await signOut()
+    navigate('/');
+  }
 
-export default SignOut;
+  return (
+    <button type="button" onClick={handleSignOut}>
+      Sign out
+    </button>
+  )
+}

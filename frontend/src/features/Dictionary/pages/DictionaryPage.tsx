@@ -1,6 +1,6 @@
 import React from 'react';
 import Dictionary from '../../Dictionary/components/Dictionary';
-import './../../../css/Home.css'
+import './DictionaryPage.css'
 
 const DictionaryPage: React.FC = () => {
     return (

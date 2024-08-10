@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import '../../../css/AccordionPanel.css';
+import './AccordionPanel.css';
 
 interface AccordionPanelProps {
   title: string;
-  categories: string[]; // Ensure categories is an array of strings
-  imageUrls: string[]; // Ensure imageUrls is an array of strings
+  categories: string[];
+  imageUrls: string[];
   description: string;
 }
 

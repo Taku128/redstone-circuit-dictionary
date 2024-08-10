@@ -1,6 +1,6 @@
 import React from 'react';
 import AccordionPanel from './AccordionPanel';
-import '../../../css/DictionaryItem.css';
+import './DictionaryItem.css';
 
 export interface DictionaryItemProps {
   Number: number;

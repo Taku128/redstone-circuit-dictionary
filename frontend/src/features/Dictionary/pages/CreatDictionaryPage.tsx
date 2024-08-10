@@ -1,13 +1,12 @@
 // pages/CreateDictionary.tsx
 
 import React, { useState } from 'react';
-import '../../../css/CreatDictonray.css';
-
 import { CognitoUserPool } from 'amazon-cognito-identity-js';
 import awsConfiguration from '../../../awsConfiguration';
-import Login from '../../Auth/components/Login';
 import SignOut from '../../Auth/pages/SignOut/SignOutPage';
 import UseFetchAuthSession from '../hooks/useFetchAuthSession';
+import SignIn from '../../Auth/pages/SignIn/SignInPage';
+import './CreatDictionaryPage.css';
 
 const userPool = new CognitoUserPool({
   UserPoolId: awsConfiguration.UserPoolId,
@@ -167,11 +166,7 @@ const CreateDictionary = () => {
         </div>
       );
     } else {
-      return (
-        <div className="unauthorizedMode">
-          <Login />
-        </div>
-      );
+      return (<SignIn/>)
     }
   };
 

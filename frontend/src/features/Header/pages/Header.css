@@ -9,7 +9,7 @@ header {
 
   @media (max-width: 768px) {
     header {
-      flex-direction: column; /* 垂直方向に並べる例 */
+      flex-direction: column; 
       align-items: center;
     }
     a {
@@ -32,6 +32,11 @@ header {
     margin-right: 10px;
     border: 1px solid #ced4da;
     border-radius: 4px;
+  }
+
+  .main-header form{
+    max-width: 500px;
+    width: 30%;
   }
   
   .home-button {
@@ -69,11 +74,6 @@ header {
   button:hover {
     background-color: #0056b3;
   }
-  
-  /* header.header-toggled {
-    background-color: #343a40;
-    color: white;
-  } */
 
   select {
     display: flex;

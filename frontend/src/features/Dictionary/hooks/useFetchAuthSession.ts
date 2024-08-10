@@ -1,5 +1,3 @@
-// hooks/useFetchAuthSession.ts
-
 import { fetchAuthSession } from 'aws-amplify/auth';
 
 const useFetchAuthSession = async () => {
