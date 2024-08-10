@@ -11,6 +11,9 @@ provider:
       go-lambda-dynamo_example:
         path: ./
         file: Dockerfile
+      dev-cognito-lambda:
+        path: ./
+        file: Dockerfile.cognito
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -21,6 +24,10 @@ provider:
         - dynamodb:UpdateItem
       Resource:
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminConfirmSignUp
+      Resource: "*"
 
 functions:
   getDictionaryItems:
@@ -43,6 +50,15 @@ functions:
           cors: true 
     environment:
       DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
+  confirmSignUp:
+    image:
+        name: dev-cognito-lambda
+    events:
+      - cognitoUserPool:
+          pool: Dev_RedstoneCircuitDictonary_UserPool
+          trigger: PreSignUp
+    environment:
+      REGION: ${self:provider.region}
 
 resources:
   Resources:
@@ -71,3 +87,47 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: Dev_RedstoneCircuitDictonary_UserPool
+        UsernameConfiguration:
+          CaseSensitive: false
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireUppercase: false
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireSymbols: false
+            TemporaryPasswordValidityDays: 7
+        AdminCreateUserConfig:
+          AllowAdminCreateUserOnly: false
+        MfaConfiguration: OFF
+        DeviceConfiguration:
+          ChallengeRequiredOnNewDevice: false
+          DeviceOnlyRememberedOnUserPrompt: false
+
+    CognitoUserPoolGroup:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        GroupName: AdminGroup
+        UserPoolId:
+          Ref: CognitoUserPool
+        Description: "Group for admin users"
+        Precedence: 1
+
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: Dev_RedstoneCircuitDictonary
+        UserPoolId:
+          Ref: CognitoUserPool
+        GenerateSecret: false
+        ExplicitAuthFlows:
+          - ALLOW_USER_SRP_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+          - ALLOW_CUSTOM_AUTH
+        SupportedIdentityProviders:
+          - COGNITO

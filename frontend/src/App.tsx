@@ -1,8 +1,7 @@
-import React from 'react';
-import './App.css';
-import RouterComponent from './components/Router';
+import RouterComponent from './routes/Router';
 import { BrowserRouter } from 'react-router-dom';
-import Header from './components/Header';
+import Header from './features/Header/pages/Header';
+import './App.css';
 
 function App() {
   const basePath = process.env.PUBLIC_URL || "/";
