@@ -17,7 +17,7 @@ type DictionaryWordRepo struct {
 
 func NewDictionaryWordRepo() (*DictionaryWordRepo, int, error) {
 	return &DictionaryWordRepo{
-		TableName: "dev-serverless-test",
+		TableName: "dev-redstoneCircuitDictionary-words",
 	}, http.StatusOK, nil
 }
 
@@ -60,8 +60,47 @@ func (r *DictionaryWordRepo) List(word string) (*[]DictionaryWord, int, error) {
 	return &dictionaryWords, http.StatusOK, nil
 }
 
+// poster、投稿日時を指定したDictionaryWordを取得する
+func (r *DictionaryWordRepo) SearchByPoster(poster, from, to string) (*[]DictionaryWord, int, error) {
+	sess := session.Must(session.NewSession())
+	svc := dynamodb.New(sess)
+
+	keyCond := expression.Key("poster").Equal(expression.Value(poster))
+	if from != "" {
+		keyCond.And(expression.Key("created_at").GreaterThanEqual(expression.Value(from)))
+	}
+	if to != "" {
+		keyCond.And(expression.Key("created_at").LessThanEqual(expression.Value(to)))
+	}
+
+	expr, err := expression.NewBuilder().WithKeyCondition(keyCond).Build()
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Errorf("failed to build expression: %w", err)
+	}
+
+	input := &dynamodb.QueryInput{
+		TableName:                 aws.String(r.TableName),
+		IndexName:                 aws.String("poster_index"),
+		KeyConditionExpression:    expr.KeyCondition(),
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+	}
+
+	result, err := svc.Query(input)
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Errorf("failed to query table: %w", err)
+	}
+
+	var dictionaryWords []DictionaryWord
+	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dictionaryWords)
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Errorf("failed to unmarshal dictionary_words: %w", err)
+	}
+	return &dictionaryWords, http.StatusOK, nil
+}
+
 // DictionaryWordの項目を作成、編集
-func (r *DictionaryWordRepo) CreatOrUpdate(dictionaryWord DictionaryWord) (int, error) {
+func (r *DictionaryWordRepo) CreateOrUpdate(dictionaryWord DictionaryWord) (int, error) {
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
 
@@ -69,6 +108,8 @@ func (r *DictionaryWordRepo) CreatOrUpdate(dictionaryWord DictionaryWord) (int, 
 	update.Set(expression.Name("description"), expression.Value(dictionaryWord.Description))
 	update.Set(expression.Name("category"), expression.Value(dictionaryWord.Category))
 	update.Set(expression.Name("video"), expression.Value(dictionaryWord.Video))
+	update.Set(expression.Name("poster"), expression.Value(dictionaryWord.Poster))
+	update.Set(expression.Name("created_at"), expression.Value(dictionaryWord.CreatedAt))
 
 	expr, err := expression.NewBuilder().WithUpdate(update).Build()
 	if err != nil {
@@ -91,5 +132,26 @@ func (r *DictionaryWordRepo) CreatOrUpdate(dictionaryWord DictionaryWord) (int, 
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("failed to create dictionary_words in DynamoDB: %w", err)
 	}
+	return http.StatusOK, nil
+}
+
+func (r *DictionaryWordRepo) Delete(id string) (int, error) {
+	sess := session.Must(session.NewSession())
+	svc := dynamodb.New(sess)
+
+	input := &dynamodb.DeleteItemInput{
+		TableName: aws.String(r.TableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"Number": {
+				N: aws.String(id),
+			},
+		},
+	}
+
+	_, err := svc.DeleteItem(input)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("failed to delete item: %w", err)
+	}
+
 	return http.StatusOK, nil
 }

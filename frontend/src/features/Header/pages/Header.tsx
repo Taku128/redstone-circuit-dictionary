@@ -18,7 +18,7 @@ const Header: React.FC = () => {
         />
         <button type="submit" className='search-button'>Search</button>
       </form>
-      <Link to="/Creat" className='home-button'>新しく投稿する</Link>
+      <Link to="/Create" className='home-button'>新しく投稿する</Link>
     </header>
   );
 };

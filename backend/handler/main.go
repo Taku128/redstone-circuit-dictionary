@@ -6,72 +6,80 @@ import (
 	"fmt"
 	"net/http"
 
-	"example.com/hello-world/usecase"
-	"example.com/hello-world/usecase/input"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func CreateResponse(statusCode int, body string) events.APIGatewayProxyResponse {
+func createResponse(statusCode int, body, allowedOrigin string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: statusCode,
 		Headers: map[string]string{
-			"Content-Type":                "application/json",
-			"Access-Control-Allow-Origin": "*", // CORS header
+			"Content-Type":                     "application/json",
+			"Access-Control-Allow-Origin":      allowedOrigin,
+			"Access-Control-Allow-Credentials": "true",
 		},
 		Body: body,
 	}
 }
 
+func getAllowedOrigin(requestOrigin string) string {
+	allowedOrigins := []string{"http://localhost:3000", "https://staging.d1631t3ap8rd8k.amplifyapp.com/"}
+	for _, origin := range allowedOrigins {
+		if origin == requestOrigin {
+			return origin
+		}
+	}
+	return "null"
+}
+
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	if request.HTTPMethod == "OPTIONS" {
-		// Preflight request
+	origin := request.Headers["origin"]
+	allowedOrigin := getAllowedOrigin(origin)
+	if request.HTTPMethod == http.MethodOptions {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 200,
 			Headers: map[string]string{
-				"Content-Type":                 "application/json",
-				"Access-Control-Allow-Origin":  "*",
-				"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-				"Access-Control-Allow-Headers": "Content-Type",
+				"Content-Type":                     "application/json",
+				"Access-Control-Allow-Origin":      allowedOrigin,
+				"Access-Control-Allow-Methods":     "GET, POST, DELETE, OPTIONS",
+				"Access-Control-Allow-Headers":     "Content-Type, Authorization",
+				"Access-Control-Allow-Credentials": "true",
 			},
-			Body: "",
+			Body: "message: Success",
 		}, nil
 	}
 
-	var dictionaryWord input.NotNumberDictionaryWord
+	var actionType string
+
 	if request.Body != "" {
-		err := json.Unmarshal([]byte(request.Body), &dictionaryWord)
+		bodyData := struct {
+			ActionType string `json:"action_type"`
+		}{}
+		err := json.Unmarshal([]byte(request.Body), &bodyData)
 		if err != nil {
-			return CreateResponse(http.StatusBadRequest, fmt.Errorf("bad request: %v", err).Error()), nil
+			return createResponse(http.StatusBadRequest, fmt.Errorf("bad request: %v", err).Error(), allowedOrigin), nil
+		}
+		actionType = bodyData.ActionType
+	}
+
+	// GETはBodyがないのでQueryパラメータを使う
+	if request.HTTPMethod == http.MethodGet || request.HTTPMethod == http.MethodDelete {
+		result, ok := request.QueryStringParameters["action_type"]
+		if !ok {
+			actionType = ""
+		} else {
+			actionType = result
 		}
 	}
 
-	switch request.HTTPMethod {
-	case "GET":
-		word, ok := request.QueryStringParameters["word"]
-		if !ok {
-			word = ""
-		}
-		getDictionaryWord, statusCode, err := usecase.GetDictionaryWord(ctx, word)
-		if err != nil {
-			return CreateResponse(statusCode, err.Error()), err
-		}
-		response, err := json.Marshal(getDictionaryWord)
-		if err != nil {
-			return CreateResponse(http.StatusBadRequest, fmt.Errorf("failed to marshal dictionary word: %v", err).Error()), err
-		}
-		return CreateResponse(statusCode, string(response)), err
-
-	case "POST":
-		statusCode, err := usecase.CreateDictionaryWord(ctx, dictionaryWord)
-		if err != nil {
-			return CreateResponse(statusCode, err.Error()), nil
-		}
-		return CreateResponse(statusCode, "Data created successfully"), nil
+	switch actionType {
+	case "dictionary_word":
+		return dictionaryWord(ctx, request)
 
 	default:
-		return CreateResponse(http.StatusMethodNotAllowed, "Method Not Allowed"), nil
+		return createResponse(http.StatusBadRequest, "Invalid action_type", allowedOrigin), nil
 	}
+
 }
 
 func main() {

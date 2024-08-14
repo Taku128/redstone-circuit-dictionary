@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom';
 const useSearch = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const navigate = useNavigate();
+  const action = "get_dictionary_word";
+  const actionType = "dictionary_word";
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
-
+  
   const handleSearchSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -18,7 +20,7 @@ const useSearch = () => {
     }
 
     try {
-      const response = await fetch(`https://u4dokqntp1.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary/?word=${searchQuery}`);
+      const response = await fetch(`https://c3gfeuoxd5.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary/?word=${searchQuery}&action=${action}&action_type=${actionType}`);
       const data = await response.json();
       console.log('Search results:', data);
       navigate('/', { state: { results: data, query: searchQuery } });
