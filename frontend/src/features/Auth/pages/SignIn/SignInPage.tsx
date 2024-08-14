@@ -25,7 +25,7 @@ export default function SignIn() {
         password: form.elements.password.value,
       })
       setError('');
-      navigate('/');
+      navigate('/Create');
     } catch(err){
       if (err instanceof Error) {
         setError(err.message);

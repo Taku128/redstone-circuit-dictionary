@@ -30,6 +30,7 @@ header {
   input {
     padding: 5px;
     margin-right: 10px;
+    min-width: 120px;
     border: 1px solid #ced4da;
     border-radius: 4px;
   }
@@ -115,5 +116,6 @@ header {
   }
 
   .search-button {
+    min-width: 90px;
     margin-right: 40px;
   }

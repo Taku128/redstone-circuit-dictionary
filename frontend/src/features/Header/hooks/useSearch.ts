@@ -20,7 +20,7 @@ const useSearch = () => {
     }
 
     try {
-      const response = await fetch(`https://u4dokqntp1.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary/?word=${searchQuery}&action=${action}&action_type=${actionType}`);
+      const response = await fetch(`https://c3gfeuoxd5.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary/?word=${searchQuery}&action=${action}&action_type=${actionType}`);
       const data = await response.json();
       console.log('Search results:', data);
       navigate('/', { state: { results: data, query: searchQuery } });

@@ -7,6 +7,7 @@ import SignOut from '../../Auth/pages/SignOut/SignOutPage';
 import UseFetchAuthSession from '../hooks/useFetchAuthSession';
 import SignIn from '../../Auth/pages/SignIn/SignInPage';
 import './CreateDictionaryPage.css';
+import EditDictionaryPage from './EditDictionaryPage';
 
 const userPool = new CognitoUserPool({
   UserPoolId: awsConfiguration.UserPoolId,
@@ -63,6 +64,7 @@ const CreateDictionary = () => {
     e.preventDefault();
 
     var username: string = '';
+    var cognitoSession: string = '';
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
       try {
@@ -79,6 +81,7 @@ const CreateDictionary = () => {
         });
 
         if (session.isValid()) {
+          cognitoSession = session.getAccessToken().getJwtToken();
           username = cognitoUser.getUsername();
         }
         else {
@@ -113,11 +116,13 @@ const CreateDictionary = () => {
     const requestBody = {
       action: "create_dictionary_word", 
       action_type: "dictionary_word",
+      action_user: username,
+      cognito_session: cognitoSession,
       data: updatedFormData,
     };
     try {
       const token = await UseFetchAuthSession();
-      const response = await fetch('https://u4dokqntp1.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary', {
+      const response = await fetch('https://c3gfeuoxd5.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,6 +221,7 @@ const CreateDictionary = () => {
     if (cognitoUser) {
       return (
         <div className="authorizedMode">
+          <EditDictionaryPage/>
           {renderCreateDictionary()}
           <SignOut />
         </div>

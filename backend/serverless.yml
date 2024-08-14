@@ -1,17 +1,17 @@
-service: go-lambda-dynamo
+service: redstoneCircuitDictionary
 
 provider:
   name: aws
   region: ap-northeast-1
   stage: ${opt:stage, 'dev'}
   environment:
-    DYNAMODB_TABLE: ${opt:stage, self:provider.stage}-serverless-test
+    DYNAMODB_TABLE: ${opt:stage, 'dev'}-redstoneCircuitDictionary-words
   ecr:
     images:
-      go-lambda-dynamo_example:
+      redstoneCircuitDictionary-http:
         path: ./
         file: Dockerfile
-      dev-cognito-lambda:
+      redstoneCircuitDictionary-cognito:
         path: ./
         file: Dockerfile.cognito
   iamRoleStatements:
@@ -22,40 +22,53 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
       Resource:
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/poster_index"
     - Effect: Allow
       Action:
         - cognito-idp:AdminConfirmSignUp
+      Resource: "arn:aws:cognito-idp:${self:provider.region}:${aws:accountId}:userpool/${self:resources.Resources.CognitoUserPool.Properties.UserPoolName}"
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
       Resource: "*"
 
 functions:
-  getDictionaryItems:
+  httpHandler:
     image:
-        name: go-lambda-dynamo_example
+        name: redstoneCircuitDictionary-http
     events:
       - http:
           path: dictionary
           method: get
           cors: true 
-    environment:
-      DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
-  addDictionaryItems:
-    image:
-        name: go-lambda-dynamo_example
-    events:
       - http:
           path: dictionary
           method: post
-          cors: true 
+          cors: true
+      - http:
+          path: dictionary
+          method: delete
+          cors:
+            origins:
+              - 'http://localhost:3000' 
+              - 'https://staging.d1631t3ap8rd8k.amplifyapp.com/' 
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true
     environment:
       DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
   confirmSignUp:
     image:
-        name: dev-cognito-lambda
+        name: redstoneCircuitDictionary-cognito
     events:
       - cognitoUserPool:
-          pool: Dev_RedstoneCircuitDictonary_UserPool
+          pool: ${opt:stage, 'dev'}_RedstoneCircuitDictonary_UserPool
           trigger: PreSignUp
     environment:
       REGION: ${self:provider.region}
@@ -69,16 +82,20 @@ resources:
         AttributeDefinitions:
           - AttributeName: Number
             AttributeType: N
-          - AttributeName: word
+          - AttributeName: poster
+            AttributeType: S
+          - AttributeName: created_at
             AttributeType: S
         KeySchema:
           - AttributeName: Number
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: word_index
+          - IndexName: poster_index
             KeySchema: 
-              - AttributeName: word
+              - AttributeName: poster
                 KeyType: HASH
+              - AttributeName: created_at
+                KeyType: RANGE
             Projection: 
               ProjectionType: ALL            
             ProvisionedThroughput:
@@ -91,7 +108,7 @@ resources:
     CognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
-        UserPoolName: Dev_RedstoneCircuitDictonary_UserPool
+        UserPoolName: ${opt:stage, 'dev'}_RedstoneCircuitDictonary_UserPool
         UsernameConfiguration:
           CaseSensitive: false
         Policies:
@@ -121,7 +138,7 @@ resources:
     CognitoUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        ClientName: Dev_RedstoneCircuitDictonary
+        ClientName: ${opt:stage, 'dev'}_RedstoneCircuitDictonary
         UserPoolId:
           Ref: CognitoUserPool
         GenerateSecret: false

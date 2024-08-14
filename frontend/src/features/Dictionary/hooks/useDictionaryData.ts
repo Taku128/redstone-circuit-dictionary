@@ -16,7 +16,7 @@ const useDictionaryData = () => {
             setDictionary(searchResults);
         } else {
             try {
-                const response = await axios.get<DictionaryItemProps[]>(`https://u4dokqntp1.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary/?action=${action}&action_type=${actionType}`);
+                const response = await axios.get<DictionaryItemProps[]>(`https://c3gfeuoxd5.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary/?action=${action}&action_type=${actionType}`);
                 const sortedData = response.data.sort((a, b) => a.word.localeCompare(b.word));
                 setDictionary(sortedData);
             } catch (error) {
@@ -26,7 +26,7 @@ const useDictionaryData = () => {
     };
 
     fetchData();
-  }, [location.state]); // 空の依存配列を指定することで、初回レンダリング時のみ実行される
+  }, [location.state]);
 
   return dictionary;
 };
