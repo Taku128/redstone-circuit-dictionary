@@ -70,6 +70,18 @@
     background-color: #45a049;
   }
 
+  .save-dictionary-button{
+    background-color: #007bff;
+  }
+
+  .save-button:hover{
+    background-color: #0056b3 !important;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #0056b3;
+  }
+
   .response-message {
     margin-top: 20px;
     margin-bottom: 20px;

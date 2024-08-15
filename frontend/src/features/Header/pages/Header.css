@@ -27,12 +27,18 @@ header {
     align-items: center;
   }
   
-  input {
+  .main-header input {
     padding: 5px;
     margin-right: 10px;
     min-width: 120px;
-    border: 1px solid #ced4da;
+    border: 2px solid #ced4da;
     border-radius: 4px;
+  }
+
+  .main-header input:focus {
+    border: 2px solid #ccdbeb;
+    outline-color: #a7a7a7;
+    background-color: #f4f8fc;
   }
 
   .main-header form{
