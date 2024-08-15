@@ -59,6 +59,10 @@
     cursor: pointer;
     color: #3a3c3f;
   }
+
+  .accordion-toggle:hover {
+    background: none;
+  }
   
   .accordion-content {
     padding: 10px;

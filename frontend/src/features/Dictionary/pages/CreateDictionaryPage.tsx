@@ -207,8 +207,8 @@ const CreateDictionary = () => {
           ))}
           <button type="button" onClick={addVideoInput} className='create-dictionary-button'>Add Video</button>
           <div className='saveOrReset'>
-            <button type="submit" className='create-dictionary-button'>Save</button>
-            <button type="button" onClick={resetForm} className='create-dictionary-button'>Reset</button>
+            <button type="submit" className='save-dictionary-button'>Save</button>
+            <button type="button" onClick={resetForm} className='reset-dictionary-button'>Reset</button>
           </div>
         </form>
         {responseMessage && <div className='response-message'>{responseMessage}</div>}

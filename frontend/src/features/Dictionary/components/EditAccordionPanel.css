@@ -16,8 +16,16 @@
     cursor: pointer;
   }
 
+  .accordion-button{
+    display: flex;
+  }
+
   .accordion-header:hover {
     background-color: #e5e6eb;
+  }
+
+  .accordion-header.no-hover:hover {
+    background-color: transparent; /* ボタン上ではホバー効果を無効に */
   }
 
   .accordion-header-test {
@@ -58,6 +66,10 @@
     font-size: 2em;
     cursor: pointer;
     color: #3a3c3f;
+  }
+
+  .accordion-toggle:hover {
+    background: none;
   }
   
   .accordion-content {
@@ -114,8 +126,16 @@
     height: 40px;
   }
 
+  .accordion-delete:hover{
+    background-color: rgb(163, 48, 48);
+  }
+
   .accordion-edit{
     background-color: rgb(47, 170, 53);
     width: 80px;
     height: 40px;
+  }
+
+  .accordion-edit:hover{
+    background-color: rgb(23, 105, 27);
   }
