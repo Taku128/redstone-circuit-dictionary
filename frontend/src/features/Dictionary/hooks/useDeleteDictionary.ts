@@ -11,9 +11,9 @@ const userPool = new CognitoUserPool({
 const useDeleteDictionaryData = () => {
   const [responseMessage, setResponseMessage] = useState('');
 
-  const deleteDictionaryData = useCallback(async (id: number) => {
-        let username: string = '';
-        let cognitoSession: string = '';
+  const deleteDictionaryData = useCallback(async (id: number, onSuccess: () => void) => {
+        let username = '';
+        let cognitoSession = '';
         const action = "delete_dictionary_word";
         const actionType = "dictionary_word";
 
@@ -68,8 +68,8 @@ const useDeleteDictionaryData = () => {
               console.error('Error delete data', errorText);
               throw new Error(`Error delete data: ${errorText}`);
             }
-            console.log('Data delete successfully');
             setResponseMessage('Data delete successfully');
+            onSuccess();
           } catch (error) {
             console.error('Failed to fetch', error);
             setResponseMessage('Error: ' + error);

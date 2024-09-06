@@ -17,17 +17,21 @@ export interface EditDictionaryItemProps {
 
 interface EditDictionaryItemComponentProps {
   item: EditDictionaryItemProps;
+  onDelete: (id: number) => void; // ここを追加
 }
 
 
-const EditDictionaryItem: React.FC<EditDictionaryItemComponentProps> = ({ item }) => {
+const EditDictionaryItem: React.FC<EditDictionaryItemComponentProps> = ({  item, onDelete }) => {
     const { deleteDictionaryData } = useDeleteDictionaryData();
 
     const parsedCategories: string[] = JSON.parse(item.category);
     const parsedImageUrls: string[] = JSON.parse(item.video);
 
-    const handleDelete = (id: number) => {
-        deleteDictionaryData(id); 
+    const handleDelete = async (id: number) => {
+      // データ削除が成功した場合に親コンポーネントの onDelete を呼び出す
+      await deleteDictionaryData(id, () => {
+        onDelete(id);// 親コンポーネントから削除イベントを通知
+      });
     };
 
     const handleEdit = (id: number) => {
@@ -43,7 +47,7 @@ const EditDictionaryItem: React.FC<EditDictionaryItemComponentProps> = ({ item }
         imageUrls={parsedImageUrls}
         description={item.description}
         createdAt={item.created_at}
-        onDelete={handleDelete}
+        onDelete={() => handleDelete(item.Number)}
         onEdit={handleEdit}
         />
     );

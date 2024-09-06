@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	// cognitoUserPoolId = "ap-northeast-1_THl6NTtRB"
 	cognitoRegion = "ap-northeast-1"
 )
 
+// トークンからユーザー名を取得
 func GetUsernameFromToken(token string) (string, error) {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(cognitoRegion),
