@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -23,10 +24,10 @@ func createResponse(statusCode int, body, allowedOrigin string) events.APIGatewa
 }
 
 func getAllowedOrigin(requestOrigin string) string {
-	allowedOrigins := []string{"http://localhost:3000", "https://staging.d1631t3ap8rd8k.amplifyapp.com/"}
+	allowedOrigins := []string{"http://localhost:3000", "https://staging.d1631t3ap8rd8k.amplifyapp.com"}
 	for _, origin := range allowedOrigins {
 		if origin == requestOrigin {
-			return origin
+			return requestOrigin
 		}
 	}
 	return "null"
@@ -35,6 +36,7 @@ func getAllowedOrigin(requestOrigin string) string {
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	origin := request.Headers["origin"]
 	allowedOrigin := getAllowedOrigin(origin)
+	log.Printf("origin: %s", allowedOrigin)
 	if request.HTTPMethod == http.MethodOptions {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 200,

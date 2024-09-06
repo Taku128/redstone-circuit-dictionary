@@ -56,7 +56,7 @@ functions:
           cors:
             origins:
               - 'http://localhost:3000' 
-              - 'https://staging.d1631t3ap8rd8k.amplifyapp.com/' 
+              - 'https://staging.d1631t3ap8rd8k.amplifyapp.com' 
             headers:
               - Content-Type
               - Authorization
