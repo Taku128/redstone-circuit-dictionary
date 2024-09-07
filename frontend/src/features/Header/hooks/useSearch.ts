@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import endpoint from '../../../endpoint';
 
 const useSearch = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -20,7 +21,7 @@ const useSearch = () => {
     }
 
     try {
-      const response = await fetch(`https://c3gfeuoxd5.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary/?word=${searchQuery}&action=${action}&action_type=${actionType}`);
+      const response = await fetch(endpoint + `/dev/dictionary/?word=${searchQuery}&action=${action}&action_type=${actionType}`);
       const data = await response.json();
       console.log('Search results:', data);
       navigate('/', { state: { results: data, query: searchQuery } });

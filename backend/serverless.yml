@@ -51,7 +51,11 @@ functions:
           method: post
           cors: true
       - http:
-          path: dictionary
+          path: dictionary/{id}
+          method: put
+          cors: true
+      - http:
+          path: dictionary/{id}
           method: delete
           cors:
             origins:
@@ -68,7 +72,7 @@ functions:
         name: redstoneCircuitDictionary-cognito
     events:
       - cognitoUserPool:
-          pool: ${opt:stage, 'dev'}_RedstoneCircuitDictonary_UserPool
+          pool: ${opt:stage, 'dev'}_RedstoneCircuitDictionary_UserPool
           trigger: PreSignUp
     environment:
       REGION: ${self:provider.region}
@@ -108,7 +112,7 @@ resources:
     CognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
-        UserPoolName: ${opt:stage, 'dev'}_RedstoneCircuitDictonary_UserPool
+        UserPoolName: ${opt:stage, 'dev'}_RedstoneCircuitDictionary_UserPool
         UsernameConfiguration:
           CaseSensitive: false
         Policies:

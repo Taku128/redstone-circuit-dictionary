@@ -40,6 +40,7 @@ func (r *DictionaryWordRepo) List(word string) (*[]DictionaryWord, int, error) {
 
 	input := &dynamodb.ScanInput{
 		TableName: aws.String(r.TableName),
+		Limit:     aws.Int64(30),
 	}
 
 	if filterExpression != "" {
@@ -80,6 +81,7 @@ func (r *DictionaryWordRepo) SearchByPoster(poster, from, to string) (*[]Diction
 
 	input := &dynamodb.QueryInput{
 		TableName:                 aws.String(r.TableName),
+		Limit:                     aws.Int64(30),
 		IndexName:                 aws.String("poster_index"),
 		KeyConditionExpression:    expr.KeyCondition(),
 		ExpressionAttributeNames:  expr.Names(),
@@ -135,7 +137,7 @@ func (r *DictionaryWordRepo) CreateOrUpdate(dictionaryWord DictionaryWord) (int,
 	return http.StatusOK, nil
 }
 
-func (r *DictionaryWordRepo) Delete(id string) (int, error) {
+func (r *DictionaryWordRepo) Delete(id int) (int, error) {
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
 
@@ -143,7 +145,7 @@ func (r *DictionaryWordRepo) Delete(id string) (int, error) {
 		TableName: aws.String(r.TableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"Number": {
-				N: aws.String(id),
+				N: aws.String(fmt.Sprintf("%d", id)),
 			},
 		},
 	}

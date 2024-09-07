@@ -12,45 +12,43 @@ export interface EditDictionaryItemProps {
   poster: string;
   created_at: string;
   onDelete: (id: number) => void; 
-  onEdit: (id: number) => void;
+  onEdit: (id: number, updatedData: { word: string; categories: string[]; imageUrls: string[]; description: string; created_at: string }) => void;
 }
 
 interface EditDictionaryItemComponentProps {
   item: EditDictionaryItemProps;
-  onDelete: (id: number) => void; // ここを追加
+  onDelete: (id: number) => void;
+  onEdit: (id: number, updatedData: { word: string; categories: string[]; imageUrls: string[]; description: string; created_at: string }) => void;
 }
 
+const EditDictionaryItem: React.FC<EditDictionaryItemComponentProps> = ({ item, onDelete, onEdit }) => {
+  const { deleteDictionaryData } = useDeleteDictionaryData();
 
-const EditDictionaryItem: React.FC<EditDictionaryItemComponentProps> = ({  item, onDelete }) => {
-    const { deleteDictionaryData } = useDeleteDictionaryData();
+  const parsedCategories: string[] = JSON.parse(item.category);
+  const parsedImageUrls: string[] = JSON.parse(item.video);
 
-    const parsedCategories: string[] = JSON.parse(item.category);
-    const parsedImageUrls: string[] = JSON.parse(item.video);
+  const handleDelete = async (id: number) => {
+    await deleteDictionaryData(id, () => {
+      onDelete(id);
+    });
+  };
 
-    const handleDelete = async (id: number) => {
-      // データ削除が成功した場合に親コンポーネントの onDelete を呼び出す
-      await deleteDictionaryData(id, () => {
-        onDelete(id);// 親コンポーネントから削除イベントを通知
-      });
-    };
+  const handleEdit = (id: number, updatedData: { word: string; categories: string[]; imageUrls: string[]; description: string; created_at: string }) => {
+    onEdit(id, updatedData);
+  };
 
-    const handleEdit = (id: number) => {
-        console.log("Edit panel with ID:", id);
-        // Additional logic for editing can go here
-    };
-
-    return (
-        <EditAccordionPanel
-        id={item.Number}
-        title={item.word}
-        categories={parsedCategories}
-        imageUrls={parsedImageUrls}
-        description={item.description}
-        createdAt={item.created_at}
-        onDelete={() => handleDelete(item.Number)}
-        onEdit={handleEdit}
-        />
-    );
+  return (
+    <EditAccordionPanel
+      id={item.Number}
+      word={item.word}
+      category={parsedCategories}
+      video={parsedImageUrls}
+      description={item.description}
+      created_at={item.created_at} // Pass created_at to EditAccordionPanel
+      onDelete={() => handleDelete(item.Number)}
+      onEdit={handleEdit} // Pass the handleEdit function
+    />
+  );
 };
 
 export default EditDictionaryItem;

@@ -7,7 +7,7 @@ import (
 	"example.com/hello-world/domain/db"
 )
 
-func DeleteDictionaryWord(ctx context.Context, id string) (int, error) {
+func DeleteDictionaryWord(ctx context.Context, id int) (int, error) {
 	dictionaryWordRepo, statusCode, err := db.NewDictionaryWordRepo()
 	if err != nil {
 		return statusCode, err

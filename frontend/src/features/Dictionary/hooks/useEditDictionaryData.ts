@@ -4,6 +4,7 @@ import { CognitoUserPool,CognitoUserSession } from 'amazon-cognito-identity-js';
 import axios from 'axios';
 import awsConfiguration from '../../../awsConfiguration';
 import { EditDictionaryItemProps } from '../components/EditDictionaryItem';
+import endpoint from '../../../endpoint';
 
 const userPool = new CognitoUserPool({
     UserPoolId: awsConfiguration.UserPoolId,
@@ -56,7 +57,7 @@ const useEditDictionaryData = () => {
             setDictionary(searchResults);
         } else {
             try {
-                const response = await axios.get<EditDictionaryItemProps[]>(`https://c3gfeuoxd5.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary/?action=${action}&action_type=${actionType}&poster=${username}`);
+                const response = await axios.get<EditDictionaryItemProps[]>(endpoint + `/dev/dictionary/?action=${action}&action_type=${actionType}&poster=${username}`);
                 const sortedData = response.data.sort((a, b) => a.word.localeCompare(b.word));
                 setDictionary(sortedData);
             } catch (error) {

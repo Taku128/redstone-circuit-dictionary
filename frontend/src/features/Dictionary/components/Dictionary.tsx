@@ -10,15 +10,18 @@ const Dictionary: React.FC = () => {
   
     useEffect(() => {
       if (dictionary.length === 0) return;
-
-      console.log(dictionary)
   
       const groupedData = dictionary.reduce((acc, item) => {
-        const firstLetter = item.word[0].toUpperCase();
-        if (!acc[firstLetter]) {
-          acc[firstLetter] = [];
+        // item.wordが存在し、文字列であることをチェック
+        if (item.word && typeof item.word === 'string') {
+          const firstLetter = item.word[0].toUpperCase();
+          if (!acc[firstLetter]) {
+            acc[firstLetter] = [];
+          }
+          acc[firstLetter].push(item);
+        } else {
+          console.warn(`Invalid item encountered:`, item);
         }
-        acc[firstLetter].push(item);
         return acc;
       }, {} as { [key: string]: DictionaryItemProps[] });
   

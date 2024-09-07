@@ -29,7 +29,7 @@ func CreateDictionaryWord(ctx context.Context, input input.DictionaryWord) (int,
 		return statusCode, err
 	}
 
-	if input.Poster == "" || input.CreatedAt.IsZero() {
+	if input.Poster == "" || input.Word == "" {
 		return http.StatusBadRequest, fmt.Errorf("invalid dictionary word")
 	}
 
@@ -48,6 +48,13 @@ func CreateDictionaryWord(ctx context.Context, input input.DictionaryWord) (int,
 	// 重複しない項目のパーティションキーを作成
 	number := int(uuid.New().ID())
 
+	// 時間の取得
+	loc, err := time.LoadLocation("Asia/Tokyo")
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("failed to load location: %w", err)
+	}
+	t := time.Now().In(loc)
+
 	// dbに保存するデータをセット
 	createDictionaryWord := &db.DictionaryWord{
 		Number:      number,
@@ -56,7 +63,7 @@ func CreateDictionaryWord(ctx context.Context, input input.DictionaryWord) (int,
 		Category:    input.Category,
 		Video:       input.Video,
 		Poster:      input.Poster,
-		CreatedAt:   input.CreatedAt.Format(time.RFC3339),
+		CreatedAt:   t.String(),
 	}
 
 	// dbに保存
