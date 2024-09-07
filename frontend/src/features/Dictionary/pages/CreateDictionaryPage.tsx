@@ -26,7 +26,6 @@ const CreateDictionary = () => {
   const [videos, setVideos] = useState<string[]>(['']);
   const [categories, setCategories] = useState<string[]>(['']);
   const [responseMessage, setResponseMessage] = useState('');
-  const [time, setTime] = useState(new Date());
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement| HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -100,16 +99,10 @@ const CreateDictionary = () => {
       return
     }
 
-    setTime(new Date());
-    if (!time){
-      setResponseMessage('Failed Get Current time');
-      return
-    } 
     const updatedFormData = {
       ...formData,
       category: JSON.stringify(categories.filter(category => category.trim() !== '')),
       video: JSON.stringify(videos.filter(video => video.trim() !== '')),
-      created_at: time.toISOString(),
       poster: username,
     };
 
@@ -122,7 +115,7 @@ const CreateDictionary = () => {
     };
     try {
       const token = await UseFetchAuthSession();
-      const response = await fetch('https://c3gfeuoxd5.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary', {
+      const response = await fetch('https://gn2nsx6lu3.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

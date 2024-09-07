@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"example.com/hello-world/domain/cognito"
 	"example.com/hello-world/usecase"
@@ -63,7 +64,7 @@ func dictionaryWord(ctx context.Context, request events.APIGatewayProxyRequest) 
 	}
 
 	// トークンを検証し、ユーザー情報を取得
-	if request.HTTPMethod == http.MethodPost || request.HTTPMethod == http.MethodDelete {
+	if request.HTTPMethod == http.MethodPost || request.HTTPMethod == http.MethodDelete || request.HTTPMethod == http.MethodPut {
 		if cognitoSession == "" {
 			return createResponse(http.StatusUnauthorized, string("Unauthorized"), allowedOrigin), nil
 		}
@@ -128,12 +129,35 @@ func dictionaryWord(ctx context.Context, request events.APIGatewayProxyRequest) 
 		default:
 			return createResponse(http.StatusBadRequest, "Invalid post action", allowedOrigin), nil
 		}
+	case http.MethodPut:
+		switch action {
+		case "update_dictionary_word":
+			idStr, ok := request.PathParameters["id"]
+			if !ok {
+				return createResponse(http.StatusBadRequest, fmt.Errorf("failed to get id").Error(), allowedOrigin), nil
+			}
+			id, err := strconv.Atoi(idStr)
+			if err != nil {
+				return createResponse(http.StatusBadRequest, fmt.Errorf("failed to marshal id").Error(), allowedOrigin), nil
+			}
+			statusCode, err := usecase.UpdateDictionaryWord(ctx, dictionaryWord, int(id))
+			if err != nil {
+				return createResponse(statusCode, err.Error(), allowedOrigin), nil
+			}
+			return createResponse(statusCode, "Data delete successfully", allowedOrigin), nil
+		default:
+			return createResponse(http.StatusBadRequest, "Invalid delete action", allowedOrigin), nil
+		}
 	case http.MethodDelete:
 		switch action {
 		case "delete_dictionary_word":
-			id, ok := request.QueryStringParameters["id"]
+			idStr, ok := request.PathParameters["id"]
 			if !ok {
-				id = ""
+				return createResponse(http.StatusBadRequest, fmt.Errorf("failed to get id").Error(), allowedOrigin), nil
+			}
+			id, err := strconv.Atoi(idStr)
+			if err != nil {
+				return createResponse(http.StatusBadRequest, fmt.Errorf("failed to marshal id").Error(), allowedOrigin), nil
 			}
 			statusCode, err := usecase.DeleteDictionaryWord(ctx, id)
 			if err != nil {

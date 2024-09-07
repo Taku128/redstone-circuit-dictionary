@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { CognitoUserPool,CognitoUserSession } from 'amazon-cognito-identity-js';
 import UseFetchAuthSession from '../hooks/useFetchAuthSession';
 import awsConfiguration from '../../../awsConfiguration';
+import endpoint from '../../../endpoint';
 
 const userPool = new CognitoUserPool({
     UserPoolId: awsConfiguration.UserPoolId,
@@ -54,7 +55,7 @@ const useDeleteDictionaryData = () => {
 
         try {
             const token = await UseFetchAuthSession();
-            const response = await fetch(`https://c3gfeuoxd5.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary/?id=${id}&action=${action}&action_type=${actionType}&poster=${username}&cognito_session=${cognitoSession}`, {
+            const response = await fetch(endpoint + `/dev/dictionary/${id}?&action=${action}&action_type=${actionType}&poster=${username}&cognito_session=${cognitoSession}`, {
               credentials: 'include',
               method: 'DELETE',
               headers: {

@@ -43,7 +43,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			Headers: map[string]string{
 				"Content-Type":                     "application/json",
 				"Access-Control-Allow-Origin":      allowedOrigin,
-				"Access-Control-Allow-Methods":     "GET, POST, DELETE, OPTIONS",
+				"Access-Control-Allow-Methods":     "GET, POST, PUT, DELETE, OPTIONS",
 				"Access-Control-Allow-Headers":     "Content-Type, Authorization",
 				"Access-Control-Allow-Credentials": "true",
 			},

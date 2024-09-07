@@ -139,3 +139,189 @@
   .accordion-edit:hover{
     background-color: rgb(23, 105, 27);
   }
+
+
+
+
+
+.edit-form{
+    min-width: 700px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 10px auto;
+    width: 70%;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+} 
+
+.edit-form h1{
+    color: black;
+}
+
+.edit-form input{
+    margin: 15px 5px;
+    display: block;
+    width: 70%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+
+.category-input-group input{
+  margin: 15px 5px;
+    display: block;
+    width: 70%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.category-input-group{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-url-input-group{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.edit-form textarea{
+    width: 75% !important;
+    font-family: Arial, sans-serif;
+    padding: .375rem .75rem;
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    overflow: hidden;
+    box-sizing: border-box;
+    resize: none;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    margin: 10px 0;
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+.accordion-content.open {
+  max-height: 1000px; /* Adjust based on your content height */
+}
+
+.edit-form p{
+  margin: 10px;
+  text-align: left;
+  font-size: 1.2em;
+  font-family: "Noto Sans JP", sans-serif;
+}
+
+.accordion-content.open p{
+  margin: 10px;
+  text-align: left;
+  font-size: 1.2em;
+  font-family: "Noto Sans JP", sans-serif;
+  overflow-wrap: break-word;
+}
+
+.accordion-content p{
+  margin: 10px;
+  text-align: left;
+  font-size: 1.2em;
+  font-family: "Noto Sans JP", sans-serif;
+  overflow-wrap: break-word;
+}
+
+.add-button {
+    max-width: 150px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    align-self: center;
+    text-align: center;
+    margin: 10px auto; 
+    display: block;
+  }
+
+
+  .add-button:hover {
+    background-color: #45a049;
+  }
+
+  .form-actions{
+    margin: 20px auto;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .save-button{
+    background-color: #007bff;
+    width: 30%;
+    padding: 10px;
+    margin: 5px auto;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .save-button:hover{
+    background-color: #0056b3 !important;
+    width: 30%;
+    padding: 10px;
+    margin: 5px auto;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .cancel-button{
+    background-color: #007bff;
+    width: 30%;
+    padding: 10px;
+    margin: 5px auto;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .cancel-button:hover{
+    background-color: #0056b3 !important;
+    width: 30%;
+    padding: 10px;
+    margin: 5px auto;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+
+  .response-message {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+  }
+  
