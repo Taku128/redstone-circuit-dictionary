@@ -1,23 +1,22 @@
 package cognito
 
 import (
+	"fmt"
+
+	"example.com/hello-world/util"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 )
 
-const (
-	cognitoRegion = "ap-northeast-1"
-)
-
 // トークンからユーザー名を取得
 func GetUsernameFromToken(token string) (string, error) {
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(cognitoRegion),
+		Region: aws.String(util.GetSetting().AWSRegion),
 	}))
 	cognitoClient := cognitoidentityprovider.New(sess)
 
-	// トークンを検証するために AdminGetUser API を呼び出す
+	// トークンを検証するためにAdminGetUserAPIを呼び出す
 	input := &cognitoidentityprovider.GetUserInput{
 		AccessToken: aws.String(token),
 	}
@@ -25,8 +24,16 @@ func GetUsernameFromToken(token string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	return *result.Username, nil
+}
 
-	// ユーザー名を取得
-	username := *result.Username
-	return username, nil
+func ConfirmUser(actionUser string, cognitoSession string) error {
+	userName, err := GetUsernameFromToken(cognitoSession)
+	if err != nil {
+		return fmt.Errorf("faild to get username from session: %v", err)
+	}
+	if userName != actionUser || actionUser == "" {
+		return fmt.Errorf("unauthorized: %v", err)
+	}
+	return nil
 }

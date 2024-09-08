@@ -16,6 +16,5 @@ func GetPosterDictionaryWord(ctx context.Context, poster string, from, to string
 	if err != nil {
 		return nil, statusCode, err
 	}
-
 	return dictionaryWords, http.StatusOK, nil
 }

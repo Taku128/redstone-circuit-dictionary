@@ -12,11 +12,9 @@ const userPool = new CognitoUserPool({
 const useDeleteDictionaryData = () => {
   const [responseMessage, setResponseMessage] = useState('');
 
-  const deleteDictionaryData = useCallback(async (id: number, onSuccess: () => void) => {
+  const deleteDictionaryData = useCallback(async (id: number, poster: string, onSuccess: () => void) => {
         let username = '';
         let cognitoSession = '';
-        const action = "delete_dictionary_word";
-        const actionType = "dictionary_word";
 
         const cognitoUser = userPool.getCurrentUser();
         if (cognitoUser) {
@@ -52,16 +50,28 @@ const useDeleteDictionaryData = () => {
             setResponseMessage('No Cognito user found');
             return
         }
+        const dictionary = {
+          poster: poster,
+        }
+
+        const requestBody = {
+          action_user: username,
+          cognito_session: cognitoSession,
+          dictionary_word: dictionary
+        };
 
         try {
             const token = await UseFetchAuthSession();
-            const response = await fetch(endpoint + `/dev/dictionary/${id}?&action=${action}&action_type=${actionType}&poster=${username}&cognito_session=${cognitoSession}`, {
+            const response = await fetch(endpoint + `/dev/dictionary/${id}`, {
               credentials: 'include',
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
+                'x-processing-type1': 'dictionary_word',
+                'x-processing-type2': 'delete_dictionary_word',
               },
+              body : JSON.stringify(requestBody),
             });
       
             if (!response.ok) {

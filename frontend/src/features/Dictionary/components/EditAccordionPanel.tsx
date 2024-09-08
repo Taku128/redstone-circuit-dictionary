@@ -17,11 +17,12 @@ interface AccordionPanelProps {
   video: string[];
   description: string;
   created_at: string;
-  onDelete: (id: number) => void; 
+  poster: string;
+  onDelete: (id: number, poster: string) => void; 
   onEdit: (id: number, updatedData: { word: string; categories: string[]; imageUrls: string[]; description: string; created_at: string }) => void;
 }
 
-const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category, video, description,created_at, onDelete, onEdit }) => {
+const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category, video, description,created_at,poster, onDelete, onEdit }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -127,6 +128,61 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${nanoseconds} +0900 JST`;
   };
 
+  const convertURLsToString = (urls: string[]): string => {
+    try {
+      // 配列をJSON形式の文字列に変換
+      const urlsString = JSON.stringify(urls);
+      return urlsString;
+    } catch (err) {
+      return '[]';
+    }
+  };
+
+  const isYoutubeURL = (url: URL): boolean => {
+    return url.hostname === 'www.youtube.com' || url.hostname === 'youtu.be';
+  };
+  
+  const isContainedEmbed = (url: URL): boolean => {
+    return url.pathname.includes('embed');
+  };
+  
+  const validateAndConvertURLs = (urls: string[]): string[] => {
+    const result: string[] = [];
+  
+    for (const v of urls) {
+      try {
+        const url = new URL(v);
+  
+        if (!isYoutubeURL(url)) {
+          return [];
+        }
+  
+        if (isContainedEmbed(url)) {
+          result.push(v);
+          continue;
+        }
+  
+        // 埋め込み式のURLに変換
+        let videoID = '';
+        if (url.hostname === 'www.youtube.com') {
+          videoID = url.searchParams.get('v') || '';
+          if (!videoID) {
+            return [];
+          }
+        } else if (url.hostname === 'youtu.be') {
+          videoID = url.pathname.substring(1);
+        }
+  
+        const embedURL = `https://www.youtube.com/embed/${videoID}`;
+        result.push(embedURL);
+      } catch (err) {
+        return [];
+      }
+    }
+  
+    return result;
+  };
+
   const handleSave = async () => {
     const updatedData = {
       word: editTitle,
@@ -155,7 +211,6 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
           const cognitoSession = session.getAccessToken().getJwtToken();
           const username = cognitoUser.getUsername();
 
-
           const updatedFormData = {
             ...updatedData,
             category: JSON.stringify(editCategories.filter(category => category.trim() !== '')),
@@ -164,11 +219,9 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
           };
 
           const requestBody = {
-            action: "update_dictionary_word",
-            action_type: "dictionary_word",
             action_user: username,
             cognito_session: cognitoSession,
-            data: updatedFormData,
+            dictionary_word: updatedFormData,
           };
 
           const token = await UseFetchAuthSession();
@@ -177,6 +230,8 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`,
+              'x-processing-type1': 'dictionary_word',
+              'x-processing-type2': 'update_dictionary_word',
             },
             body: JSON.stringify(requestBody),
           });
@@ -186,7 +241,10 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
             console.error('Error saving data', errorText);
             throw new Error(`Error saving data: ${errorText}`);
           }
-          onEdit(id, updatedData);
+          const videos = validateAndConvertURLs(updatedData.imageUrls);
+          updatedFormData.video = convertURLsToString(videos);
+          console.log(updatedFormData)
+          onEdit(id, updatedFormData);
           setResponseMessage('Data saved successfully');
         } else {
           console.log('Session Is Not Valid');
@@ -266,7 +324,7 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
             onMouseLeave={() => setIsHovering(false)}
           >
             <button className="accordion-edit" onClick={() => handleEdit()}>Edit</button>
-            <button className="accordion-delete" onClick={() => onDelete(id)}>Delete</button>
+            <button className="accordion-delete" onClick={() => onDelete(id,poster)}>Delete</button>
           </div>
         </div>
       </div>

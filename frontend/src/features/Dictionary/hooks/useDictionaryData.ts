@@ -7,8 +7,6 @@ import endpoint from '../../../endpoint';
 const useDictionaryData = () => {
   const location = useLocation(); 
   const [dictionary, setDictionary] = useState<DictionaryItemProps[]>([]);
-  const action = "get_dictionary_word";
-  const actionType = "dictionary_word";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,7 +15,14 @@ const useDictionaryData = () => {
             setDictionary(searchResults);
         } else {
             try {
-                const response = await axios.get<DictionaryItemProps[]>(endpoint +`/dev/dictionary/?action=${action}&action_type=${actionType}`);
+                const response = await axios.get<DictionaryItemProps[]>(endpoint +`/dev/dictionary/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-processing-type1': 'dictionary_word',
+                        'x-processing-type2': 'get_dictionary_word',
+                    },
+                });
                 const sortedData = response.data.sort((a, b) => a.word.localeCompare(b.word));
                 setDictionary(sortedData);
             } catch (error) {

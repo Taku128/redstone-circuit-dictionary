@@ -45,15 +45,32 @@ functions:
       - http:
           path: dictionary
           method: get
-          cors: true 
       - http:
           path: dictionary
           method: post
-          cors: true
+          cors: 
+            origins:
+              - 'http://localhost:3000'
+              - 'https://staging.d1631t3ap8rd8k.amplifyapp.com'
+            headers:
+              - Content-Type
+              - Authorization
+              - x-processing-type1
+              - x-processing-type2
+            allowCredentials: true
       - http:
           path: dictionary/{id}
           method: put
-          cors: true
+          cors: 
+            origins:
+              - 'http://localhost:3000'
+              - 'https://staging.d1631t3ap8rd8k.amplifyapp.com'
+            headers:
+              - Content-Type
+              - Authorization
+              - x-processing-type1
+              - x-processing-type2
+            allowCredentials: true
       - http:
           path: dictionary/{id}
           method: delete
@@ -64,6 +81,8 @@ functions:
             headers:
               - Content-Type
               - Authorization
+              - x-processing-type1
+              - x-processing-type2
             allowCredentials: true
     environment:
       DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
@@ -76,6 +95,7 @@ functions:
           trigger: PreSignUp
     environment:
       REGION: ${self:provider.region}
+      COGNITO_POOL_ID: !Ref CognitoUserPool
 
 resources:
   Resources:
@@ -134,17 +154,15 @@ resources:
       Type: AWS::Cognito::UserPoolGroup
       Properties:
         GroupName: AdminGroup
-        UserPoolId:
-          Ref: CognitoUserPool
+        UserPoolId: !Ref CognitoUserPool
         Description: "Group for admin users"
         Precedence: 1
 
     CognitoUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        ClientName: ${opt:stage, 'dev'}_RedstoneCircuitDictonary
-        UserPoolId:
-          Ref: CognitoUserPool
+        ClientName: ${opt:stage, 'dev'}_RedstoneCircuitDictionary
+        UserPoolId: !Ref CognitoUserPool
         GenerateSecret: false
         ExplicitAuthFlows:
           - ALLOW_USER_SRP_AUTH
