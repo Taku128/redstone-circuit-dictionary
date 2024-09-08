@@ -14,8 +14,6 @@ const userPool = new CognitoUserPool({
 const useEditDictionaryData = () => {
   const location = useLocation(); 
   const [dictionary, setDictionary] = useState<EditDictionaryItemProps[]>([]);
-  const action = "get_poster_dictionary_word";
-  const actionType = "dictionary_word";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,7 +55,14 @@ const useEditDictionaryData = () => {
             setDictionary(searchResults);
         } else {
             try {
-                const response = await axios.get<EditDictionaryItemProps[]>(endpoint + `/dev/dictionary/?action=${action}&action_type=${actionType}&poster=${username}`);
+                const response = await axios.get<EditDictionaryItemProps[]>(endpoint + `/dev/dictionary/?poster=${username}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-processing-type1': 'dictionary_word',
+                        'x-processing-type2': 'get_poster_dictionary_word',
+                    },
+                });
                 const sortedData = response.data.sort((a, b) => a.word.localeCompare(b.word));
                 setDictionary(sortedData);
             } catch (error) {

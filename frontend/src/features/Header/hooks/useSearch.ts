@@ -5,8 +5,6 @@ import endpoint from '../../../endpoint';
 const useSearch = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const navigate = useNavigate();
-  const action = "get_dictionary_word";
-  const actionType = "dictionary_word";
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -21,7 +19,14 @@ const useSearch = () => {
     }
 
     try {
-      const response = await fetch(endpoint + `/dev/dictionary/?word=${searchQuery}&action=${action}&action_type=${actionType}`);
+      const response = await fetch(endpoint + `/dev/dictionary/?word=${searchQuery}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-processing-type1': 'dictionary_word',
+            'x-processing-type2': 'get_dictionary_word',
+        },
+    });
       const data = await response.json();
       console.log('Search results:', data);
       navigate('/', { state: { results: data, query: searchQuery } });

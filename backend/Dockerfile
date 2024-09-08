@@ -3,7 +3,7 @@ WORKDIR /go/src/lambda
 COPY go.mod go.sum ./
 RUN go mod download
 COPY ./ .
-RUN GOARCH=amd64 GOOS=linux go build -a -o /main ./handler
+RUN GOARCH=amd64 GOOS=linux go build -a -o /main ./handler/https
 
 FROM debian:bullseye as runner
 WORKDIR /app/

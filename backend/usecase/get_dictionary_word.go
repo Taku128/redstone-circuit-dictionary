@@ -16,6 +16,5 @@ func GetDictionaryWord(ctx context.Context, word string) (*[]db.DictionaryWord, 
 	if err != nil {
 		return nil, statusCode, err
 	}
-
 	return dictionaryWords, http.StatusOK, nil
 }

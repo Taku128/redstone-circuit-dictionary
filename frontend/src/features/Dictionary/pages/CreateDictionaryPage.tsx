@@ -8,6 +8,7 @@ import UseFetchAuthSession from '../hooks/useFetchAuthSession';
 import SignIn from '../../Auth/pages/SignIn/SignInPage';
 import './CreateDictionaryPage.css';
 import EditDictionaryPage from './EditDictionaryPage';
+import endpoint from '../../../endpoint';
 
 const userPool = new CognitoUserPool({
   UserPoolId: awsConfiguration.UserPoolId,
@@ -107,19 +108,19 @@ const CreateDictionary = () => {
     };
 
     const requestBody = {
-      action: "create_dictionary_word", 
-      action_type: "dictionary_word",
       action_user: username,
       cognito_session: cognitoSession,
-      data: updatedFormData,
+      dictionary_word: updatedFormData,
     };
     try {
       const token = await UseFetchAuthSession();
-      const response = await fetch('https://gn2nsx6lu3.execute-api.ap-northeast-1.amazonaws.com/dev/dictionary', {
+      const response = await fetch(endpoint + '/dev/dictionary', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
+          'x-processing-type1': 'dictionary_word',
+          'x-processing-type2': 'create_dictionary_word',
         },
         body: JSON.stringify(requestBody),
       });

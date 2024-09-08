@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type Event struct {
+type CognitoEvent struct {
 	Version       string `json:"version"`
 	TriggerSource string `json:"triggerSource"`
 	Region        string `json:"region"`
@@ -21,7 +21,8 @@ type Event struct {
 	} `json:"response"`
 }
 
-func handler(ctx context.Context, event Event) (Event, error) {
+func handler(ctx context.Context, event CognitoEvent) (CognitoEvent, error) {
+	// サインアップに成功したユーザを自動承認する
 	if event.TriggerSource == "PreSignUp_SignUp" {
 		log.Printf("Auto-confirming user: %s", event.UserName)
 		event.Response.AutoConfirmUser = true

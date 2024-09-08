@@ -29,8 +29,8 @@ const EditDictionary: React.FC = () => {
     setGroupedDictionary(groupedData);
   }, [dictionary]);
 
-  const handleDelete = (id: number) => {
-    deleteDictionaryData(id, () => {
+  const handleDelete = (id: number,poster: string) => {
+    deleteDictionaryData(id,poster, () => {
       const updatedDictionary = dictionary.filter(item => item.Number !== id);
       setGroupedDictionary(
         updatedDictionary.reduce((acc, item) => {

@@ -12,12 +12,14 @@ import (
 )
 
 type DictionaryWordRepo struct {
-	TableName string
+	TableName   string
+	PosterIndex string
 }
 
 func NewDictionaryWordRepo() (*DictionaryWordRepo, int, error) {
 	return &DictionaryWordRepo{
-		TableName: "dev-redstoneCircuitDictionary-words",
+		TableName:   "dev-redstoneCircuitDictionary-words",
+		PosterIndex: "poster_index",
 	}, http.StatusOK, nil
 }
 
@@ -50,13 +52,13 @@ func (r *DictionaryWordRepo) List(word string) (*[]DictionaryWord, int, error) {
 
 	result, err := svc.Scan(input)
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("failed to scan table: %w", err)
+		return nil, http.StatusInternalServerError, fmt.Errorf("failed to scan dictionary word: %w", err)
 	}
 
 	var dictionaryWords []DictionaryWord
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dictionaryWords)
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("failed to unmarshal dictionary_words: %w", err)
+		return nil, http.StatusInternalServerError, fmt.Errorf("failed to unmarshal dictionary word: %w", err)
 	}
 	return &dictionaryWords, http.StatusOK, nil
 }
@@ -82,7 +84,7 @@ func (r *DictionaryWordRepo) SearchByPoster(poster, from, to string) (*[]Diction
 	input := &dynamodb.QueryInput{
 		TableName:                 aws.String(r.TableName),
 		Limit:                     aws.Int64(30),
-		IndexName:                 aws.String("poster_index"),
+		IndexName:                 aws.String(r.PosterIndex),
 		KeyConditionExpression:    expr.KeyCondition(),
 		ExpressionAttributeNames:  expr.Names(),
 		ExpressionAttributeValues: expr.Values(),
@@ -90,13 +92,13 @@ func (r *DictionaryWordRepo) SearchByPoster(poster, from, to string) (*[]Diction
 
 	result, err := svc.Query(input)
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("failed to query table: %w", err)
+		return nil, http.StatusInternalServerError, fmt.Errorf("failed to query dictionary word: %w", err)
 	}
 
 	var dictionaryWords []DictionaryWord
 	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &dictionaryWords)
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("failed to unmarshal dictionary_words: %w", err)
+		return nil, http.StatusInternalServerError, fmt.Errorf("failed to unmarshal dictionary word: %w", err)
 	}
 	return &dictionaryWords, http.StatusOK, nil
 }
@@ -115,7 +117,7 @@ func (r *DictionaryWordRepo) CreateOrUpdate(dictionaryWord DictionaryWord) (int,
 
 	expr, err := expression.NewBuilder().WithUpdate(update).Build()
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("couldn't build expression for update. Here's why: %w", err)
+		return http.StatusInternalServerError, fmt.Errorf("failed to build expression: %w", err)
 	}
 
 	input := &dynamodb.UpdateItemInput{
@@ -132,7 +134,7 @@ func (r *DictionaryWordRepo) CreateOrUpdate(dictionaryWord DictionaryWord) (int,
 
 	_, err = svc.UpdateItem(input)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("failed to create dictionary_words in DynamoDB: %w", err)
+		return http.StatusInternalServerError, fmt.Errorf("failed to create dictionary word: %w", err)
 	}
 	return http.StatusOK, nil
 }
@@ -152,7 +154,7 @@ func (r *DictionaryWordRepo) Delete(id int) (int, error) {
 
 	_, err := svc.DeleteItem(input)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("failed to delete item: %w", err)
+		return http.StatusInternalServerError, fmt.Errorf("failed to delete dictionary word: %w", err)
 	}
 
 	return http.StatusOK, nil
