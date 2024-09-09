@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"example.com/hello-world/util"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -16,11 +17,12 @@ type DictionaryWordRepo struct {
 	PosterIndex string
 }
 
-func NewDictionaryWordRepo() (*DictionaryWordRepo, int, error) {
+func NewDictionaryWordRepo() *DictionaryWordRepo {
+	dictionaryWordRepo := util.GetSetting().DictionaryWordTable
 	return &DictionaryWordRepo{
-		TableName:   "dev-redstoneCircuitDictionary-words",
-		PosterIndex: "poster_index",
-	}, http.StatusOK, nil
+		TableName:   dictionaryWordRepo.TableName,
+		PosterIndex: dictionaryWordRepo.PosterIndex,
+	}
 }
 
 // 指定したwordを含むDictionaryWordを取得する(指定しなければ全件取得)

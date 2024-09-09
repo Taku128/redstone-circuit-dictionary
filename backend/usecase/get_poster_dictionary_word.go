@@ -8,10 +8,7 @@ import (
 )
 
 func GetPosterDictionaryWord(ctx context.Context, poster string, from, to string) (*[]db.DictionaryWord, int, error) {
-	dictionaryWordRepo, statusCode, err := db.NewDictionaryWordRepo()
-	if err != nil {
-		return nil, statusCode, err
-	}
+	dictionaryWordRepo := db.NewDictionaryWordRepo()
 	dictionaryWords, statusCode, err := dictionaryWordRepo.SearchByPoster(poster, from, to)
 	if err != nil {
 		return nil, statusCode, err

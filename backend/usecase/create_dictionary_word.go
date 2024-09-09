@@ -67,10 +67,7 @@ func CreateDictionaryWord(ctx context.Context, input input.DictionaryWord) (int,
 	}
 
 	// dbに保存
-	dictionaryWordRepo, statusCode, err := db.NewDictionaryWordRepo()
-	if err != nil {
-		return statusCode, nil
-	}
+	dictionaryWordRepo := db.NewDictionaryWordRepo()
 	statusCode, err = dictionaryWordRepo.CreateOrUpdate(*createDictionaryWord)
 	if err != nil {
 		return statusCode, nil

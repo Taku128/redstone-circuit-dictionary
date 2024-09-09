@@ -8,11 +8,8 @@ import (
 )
 
 func DeleteDictionaryWord(ctx context.Context, id int) (int, error) {
-	dictionaryWordRepo, statusCode, err := db.NewDictionaryWordRepo()
-	if err != nil {
-		return statusCode, err
-	}
-	statusCode, err = dictionaryWordRepo.Delete(id)
+	dictionaryWordRepo := db.NewDictionaryWordRepo()
+	statusCode, err := dictionaryWordRepo.Delete(id)
 	if err != nil {
 		return statusCode, err
 	}
