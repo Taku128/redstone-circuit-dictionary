@@ -106,14 +106,14 @@ func (r *DictionaryWordRepo) SearchByPoster(poster, from, to string) (*[]Diction
 }
 
 // DictionaryWordの項目を作成、編集
-func (r *DictionaryWordRepo) CreateOrUpdate(dictionaryWord DictionaryWord) (int, error) {
+func (r *DictionaryWordRepo) CreateOrUpdate(dictionaryWord *DictionaryWord) (int, error) {
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
 
 	update := expression.Set(expression.Name("word"), expression.Value(dictionaryWord.Word))
 	update.Set(expression.Name("description"), expression.Value(dictionaryWord.Description))
-	update.Set(expression.Name("category"), expression.Value(dictionaryWord.Category))
-	update.Set(expression.Name("video"), expression.Value(dictionaryWord.Video))
+	update.Set(expression.Name("category_json"), expression.Value(dictionaryWord.CategoryJson))
+	update.Set(expression.Name("video_json"), expression.Value(dictionaryWord.VideoJson))
 	update.Set(expression.Name("poster"), expression.Value(dictionaryWord.Poster))
 	update.Set(expression.Name("created_at"), expression.Value(dictionaryWord.CreatedAt))
 
@@ -125,8 +125,8 @@ func (r *DictionaryWordRepo) CreateOrUpdate(dictionaryWord DictionaryWord) (int,
 	input := &dynamodb.UpdateItemInput{
 		TableName: aws.String(r.TableName),
 		Key: map[string]*dynamodb.AttributeValue{
-			"Number": {
-				N: aws.String(fmt.Sprintf("%d", dictionaryWord.Number)),
+			"id": {
+				N: aws.String(fmt.Sprintf("%d", dictionaryWord.ID)),
 			},
 		},
 		ExpressionAttributeNames:  expr.Names(),
@@ -148,7 +148,7 @@ func (r *DictionaryWordRepo) Delete(id int) (int, error) {
 	input := &dynamodb.DeleteItemInput{
 		TableName: aws.String(r.TableName),
 		Key: map[string]*dynamodb.AttributeValue{
-			"Number": {
+			"id": {
 				N: aws.String(fmt.Sprintf("%d", id)),
 			},
 		},

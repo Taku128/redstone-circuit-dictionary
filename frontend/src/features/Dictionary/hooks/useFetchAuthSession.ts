@@ -1,13 +1,16 @@
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { CognitoUserSession } from 'amazon-cognito-identity-js';
 
-const useFetchAuthSession = async () => {
-  try {
-    const session = await fetchAuthSession();
-    return session.tokens;
-  } catch (error) {
-    console.error('Failed to fetch auth session', error);
-    throw new Error('Failed to fetch auth session');
-  }
+const useFetchAuthSession = async (userPool: any) => {
+  const cognitoUser = userPool.getCurrentUser();
+  
+  if (!cognitoUser) return null;
+
+  return new Promise<CognitoUserSession | null>((resolve, reject) => {
+    cognitoUser.getSession((err: Error | null, session: CognitoUserSession | null) => {
+      if (err) reject(err);
+      else resolve(session);
+    });
+  });
 };
 
 export default useFetchAuthSession;

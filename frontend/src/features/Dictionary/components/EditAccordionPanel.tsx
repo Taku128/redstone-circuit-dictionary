@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { CognitoUserPool,CognitoUserSession } from 'amazon-cognito-identity-js';
-import UseFetchAuthSession from '../hooks/useFetchAuthSession';
+import useFetchAuthSession from '../hooks/useFetchAuthSession';
 import awsConfiguration from '../../../awsConfiguration';
 import endpoint from '../../../endpoint';
 import './EditAccordionPanel.css';
@@ -11,28 +11,29 @@ const userPool = new CognitoUserPool({
 });
 
 interface AccordionPanelProps {
-  id: number; 
-  word: string;
-  category: string[];
-  video: string[];
-  description: string;
-  created_at: string;
-  poster: string;
+  ID: number; 
+  Word: string;
+  Description: string;
+  Categories: string[];
+  Videos: string[];
+  CreatedAt: string;
+  Poster: string;
   onDelete: (id: number, poster: string) => void; 
-  onEdit: (id: number, updatedData: { word: string; categories: string[]; imageUrls: string[]; description: string; created_at: string }) => void;
+  onEdit: (id: number, updatedData: { word: string; categories: string[]; videos: string[]; description: string; created_at: string }) => void;
 }
 
-const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category, video, description,created_at,poster, onDelete, onEdit }) => {
+const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categories, Videos, Description,CreatedAt,Poster, onDelete, onEdit }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [session, setSession] = useState<CognitoUserSession | null>(null);
 
-  const [editTitle, setEditTitle] = useState<string>(word);
-  const [editCategories, setEditCategories] = useState<string[]>(category);
-  const [editImageUrls, setEditImageUrls] = useState<string[]>(video);
-  const [editDescription, setEditDescription] = useState<string>(description);
-  const [editCreatedAt, setEditCreatedAt] = useState<string>(created_at);
+  const [editTitle, setEditTitle] = useState<string>(Word);
+  const [editCategories, setEditCategories] = useState<string[]>(Categories);
+  const [editImageUrls, setEditImageUrls] = useState<string[]>(Videos);
+  const [editDescription, setEditDescription] = useState<string>(Description);
+  const [editCreatedAt, setEditCreatedAt] = useState<string>(CreatedAt);
   const [responseMessage, setResponseMessage] = useState<string>('');
 
 
@@ -145,6 +146,15 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
   const isContainedEmbed = (url: URL): boolean => {
     return url.pathname.includes('embed');
   };
+
+  useEffect(() => {
+    const FetchSession = async () => {
+      const fetchedSession = await useFetchAuthSession(userPool);
+      setSession(fetchedSession);
+    };
+    
+    FetchSession();
+  }, []);
   
   const validateAndConvertURLs = (urls: string[]): string[] => {
     const result: string[] = [];
@@ -187,7 +197,7 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
     const updatedData = {
       word: editTitle,
       categories: editCategories,
-      imageUrls: editImageUrls,
+      videos: editImageUrls,
       description: editDescription,
       created_at: getJSTISOString() // Update created_at with current timestamp
     };
@@ -213,8 +223,8 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
 
           const updatedFormData = {
             ...updatedData,
-            category: JSON.stringify(editCategories.filter(category => category.trim() !== '')),
-            video: JSON.stringify(editImageUrls.filter(url => url.trim() !== '')),
+            category_json: JSON.stringify(editCategories.filter(category => category.trim() !== '')),
+            video_json: JSON.stringify(editImageUrls.filter(video => video.trim() !== '')),
             poster: username,
           };
 
@@ -224,12 +234,11 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
             dictionary_word: updatedFormData,
           };
 
-          const token = await UseFetchAuthSession();
-          const response = await fetch(endpoint + `/dev/dictionary/${id}`, {
+          const response = await fetch(endpoint + `/dev/dictionary/${ID}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
+              'Authorization': `Bearer ${session}`,
               'x-processing-type1': 'dictionary_word',
               'x-processing-type2': 'update_dictionary_word',
             },
@@ -241,10 +250,10 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
             console.error('Error saving data', errorText);
             throw new Error(`Error saving data: ${errorText}`);
           }
-          const videos = validateAndConvertURLs(updatedData.imageUrls);
-          updatedFormData.video = convertURLsToString(videos);
+          const videos = validateAndConvertURLs(updatedData.videos);
+          updatedFormData.video_json = convertURLsToString(videos);
           console.log(updatedFormData)
-          onEdit(id, updatedFormData);
+          onEdit(ID, updatedFormData);
           setResponseMessage('Data saved successfully');
         } else {
           console.log('Session Is Not Valid');
@@ -263,11 +272,11 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
 
   const handleCancel = () => {
     // Reset the values to their original state and exit edit mode
-    setEditTitle(word);
-    setEditCategories(category);
-    setEditImageUrls(video);
-    setEditDescription(description);
-    setEditCreatedAt(created_at); 
+    setEditTitle(Word);
+    setEditCategories(Categories);
+    setEditImageUrls(Videos);
+    setEditDescription(Description);
+    setEditCreatedAt(CreatedAt); 
     setIsOpen(false);
     contentRef.current?.addEventListener('transitionend', () => {
       setIsEditing(false); // モーダルが閉じた後に編集モードを解除
@@ -307,9 +316,9 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
         aria-expanded={isOpen ? "true" : "false"}
       >
         <div className="accordion-header-text">
-          <h2>{word}</h2>
+          <h2>{Word}</h2>
           <div className="accordion-category">
-            {category.map((category, index) => (
+            {Categories.map((category, index) => (
               <span key={index} className='category-je'>{category}</span>
             ))}
           </div>
@@ -324,7 +333,7 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
             onMouseLeave={() => setIsHovering(false)}
           >
             <button className="accordion-edit" onClick={() => handleEdit()}>Edit</button>
-            <button className="accordion-delete" onClick={() => onDelete(id,poster)}>Delete</button>
+            <button className="accordion-delete" onClick={() => onDelete(ID,Poster)}>Delete</button>
           </div>
         </div>
       </div>
@@ -386,12 +395,12 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ id, word, category,
           </div>
         ) : (
           <>
-            <p>{description}</p>
+            <p>{Description}</p>
             <div className='accordion-videos'>
-             { video.map((video, index) => (
+             { Videos.map((video, index) => (
               <div key={index} className="accordion-video">
                 {video && (
-                  <iframe className="accordion-image" src={video} allow="fullscreen" title={`${word}`} />
+                  <iframe className="accordion-image" src={video} allow="fullscreen" title={`${Word}`} />
                 )}
               </div>
               ))}

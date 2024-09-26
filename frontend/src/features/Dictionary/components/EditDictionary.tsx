@@ -31,7 +31,7 @@ const EditDictionary: React.FC = () => {
 
   const handleDelete = (id: number,poster: string) => {
     deleteDictionaryData(id,poster, () => {
-      const updatedDictionary = dictionary.filter(item => item.Number !== id);
+      const updatedDictionary = dictionary.filter(item => item.id !== id);
       setGroupedDictionary(
         updatedDictionary.reduce((acc, item) => {
           if (item.word && typeof item.word === 'string') {
@@ -49,10 +49,10 @@ const EditDictionary: React.FC = () => {
     });
   };
 
-  const handleEdit = (id: number, updatedData: { word: string; categories: string[]; imageUrls: string[]; description: string; created_at: string }) => {
+  const handleEdit = (id: number, updatedData: { word: string; categories: string[]; videos: string[]; description: string; created_at: string }) => {
     // Update dictionary and grouped data on edit
     const updatedDictionary = dictionary.map(item =>
-      item.Number === id ? { ...item, ...updatedData } : item
+      item.id === id ? { ...item, ...updatedData } : item
     );
     setGroupedDictionary(
       updatedDictionary.reduce((acc, item) => {
@@ -79,10 +79,10 @@ const EditDictionary: React.FC = () => {
             <React.Fragment key={letter}>
               <h2 className='dictionary-list-h2'>{letter}</h2>
               {groupedDictionary[letter].map((item, idx) => (
-                <div key={item.Number + idx}>
+                <div key={item.id + idx}>
                   {idx > 0 && <Separator />}
                   <EditDictionaryItem 
-                    key={item.Number} 
+                    key={item.id} 
                     item={item} 
                     onDelete={handleDelete} 
                     onEdit={handleEdit} // Pass the handleEdit function

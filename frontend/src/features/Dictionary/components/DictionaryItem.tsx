@@ -1,13 +1,12 @@
 import React from 'react';
 import AccordionPanel from './AccordionPanel';
-import './DictionaryItem.css';
 
 export interface DictionaryItemProps {
-  Number: number;
+  id: number;
   word: string;
   description: string;
-  category: string; 
-  video: string; 
+  category_json: string; 
+  video_json: string; 
   poster: string;
   created_at: string;
 }
@@ -17,16 +16,18 @@ interface DictionaryItemComponentProps {
 }
 
 const DictionaryItem: React.FC<DictionaryItemComponentProps> = ({ item }) => {
-    const parsedCategories: string[] = JSON.parse(item.category);
-    const parsedImageUrls: string[] = JSON.parse(item.video);
-    return (
-        <AccordionPanel
-        title={item.word}
-        categories={parsedCategories}
-        imageUrls={parsedImageUrls}
-        description={item.description}
-        />
-    );
+  // JSON形式のカテゴリーとビデオURLを解析
+  const parsedCategories: string[] = JSON.parse(item.category_json);
+  const parsedVideoUrls: string[] = JSON.parse(item.video_json);
+  
+  return (
+    <AccordionPanel
+      word={item.word} 
+      categories={parsedCategories}
+      videos={parsedVideoUrls}
+      description={item.description}
+    />
+  );
 };
 
 export default DictionaryItem;
