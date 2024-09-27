@@ -74,7 +74,7 @@ export default function SignUp() {
         </div>
         {error && <div className="error">{error}</div>} {/* エラー表示 */}
         <button type="submit">サインアップ</button>
-        <Link to="/Create" className="login-button">ログイン画面に戻る</Link>
+        <Link to="/SignIn" className="login-button">ログイン画面に戻る</Link>
       </form>
     </div>
   );
