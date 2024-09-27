@@ -1,10 +1,10 @@
 package input
 
 type DictionaryWord struct {
-	Number      int    `json:"number"`
-	Word        string `json:"word"`
-	Description string `json:"description"`
-	Category    string `json:"category"`
-	Video       string `json:"video"`
-	Poster      string `json:"poster"`
+	ID           int    `json:"id"`
+	Word         string `json:"word"`
+	Description  string `json:"description"`
+	CategoryJson string `json:"category_json"`
+	VideoJson    string `json:"video_json"`
+	Poster       string `json:"poster"`
 }

@@ -1,4 +1,4 @@
-service: redstoneCircuitDictionary
+service: RedstoneCircuitDictionary
 
 provider:
   name: aws
@@ -6,14 +6,16 @@ provider:
   stage: ${opt:stage, 'dev'}
   environment:
     DYNAMODB_TABLE: ${opt:stage, 'dev'}-redstoneCircuitDictionary-words
+    REGION: ${self:provider.region}
+    COGNITO_POOL_ID: !Ref CognitoUserPool
   ecr:
     images:
-      redstoneCircuitDictionary-http:
-        path: ./
-        file: Dockerfile
-      redstoneCircuitDictionary-cognito:
-        path: ./
-        file: Dockerfile.cognito
+      redstone-circuit-dictionary-https:
+        path: .
+        file: docs/Dockerfile.https
+      redstone-circuit-dictionary-cognito:
+        path: .
+        file: docs/Dockerfile.cognito
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -40,7 +42,7 @@ provider:
 functions:
   httpHandler:
     image:
-        name: redstoneCircuitDictionary-http
+        name: redstone-circuit-dictionary-https
     events:
       - http:
           path: dictionary
@@ -88,14 +90,12 @@ functions:
       DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
   confirmSignUp:
     image:
-        name: redstoneCircuitDictionary-cognito
+        name: redstone-circuit-dictionary-cognito
     events:
       - cognitoUserPool:
-          pool: ${opt:stage, 'dev'}_RedstoneCircuitDictionary_UserPool
+          pool: ${opt:stage, 'dev'}-redstoneCircuitDictionary-userPool
           trigger: PreSignUp
-    environment:
-      REGION: ${self:provider.region}
-      COGNITO_POOL_ID: !Ref CognitoUserPool
+          existing: true
 
 resources:
   Resources:
@@ -104,14 +104,14 @@ resources:
       Properties:
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
         AttributeDefinitions:
-          - AttributeName: Number
+          - AttributeName: id
             AttributeType: N
           - AttributeName: poster
             AttributeType: S
           - AttributeName: created_at
             AttributeType: S
         KeySchema:
-          - AttributeName: Number
+          - AttributeName: id
             KeyType: HASH
         GlobalSecondaryIndexes:
           - IndexName: poster_index
@@ -132,7 +132,7 @@ resources:
     CognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
-        UserPoolName: ${opt:stage, 'dev'}_RedstoneCircuitDictionary_UserPool
+        UserPoolName: ${opt:stage, 'dev'}-redstoneCircuitDictionary-userPool
         UsernameConfiguration:
           CaseSensitive: false
         Policies:
@@ -149,7 +149,6 @@ resources:
         DeviceConfiguration:
           ChallengeRequiredOnNewDevice: false
           DeviceOnlyRememberedOnUserPrompt: false
-
     CognitoUserPoolGroup:
       Type: AWS::Cognito::UserPoolGroup
       Properties:
@@ -157,11 +156,10 @@ resources:
         UserPoolId: !Ref CognitoUserPool
         Description: "Group for admin users"
         Precedence: 1
-
     CognitoUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        ClientName: ${opt:stage, 'dev'}_RedstoneCircuitDictionary
+        ClientName: ${opt:stage, 'dev'}-redstoneCircuitDictionary
         UserPoolId: !Ref CognitoUserPool
         GenerateSecret: false
         ExplicitAuthFlows:
@@ -170,3 +168,14 @@ resources:
           - ALLOW_CUSTOM_AUTH
         SupportedIdentityProviders:
           - COGNITO
+
+plugins:
+  - serverless-plugin-scripts
+
+custom:
+  scripts:
+    hooks:
+      # Dockerfileは基本的に親のディレクトリを参照できないので、デプロイ前に複数のDockerイメージをビルドする
+      before:deploy:deploy: |
+        docker build -t redstone-circuit-dictionary-https -f ./docs/Dockerfile.https .
+        docker build -t redstone-circuit-dictionary-cognito -f ./docs/Dockerfile.cognito . 

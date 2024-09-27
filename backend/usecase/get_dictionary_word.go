@@ -8,10 +8,7 @@ import (
 )
 
 func GetDictionaryWord(ctx context.Context, word string) (*[]db.DictionaryWord, int, error) {
-	dictionaryWordRepo, statusCode, err := db.NewDictionaryWordRepo()
-	if err != nil {
-		return nil, statusCode, err
-	}
+	dictionaryWordRepo := db.NewDictionaryWordRepo()
 	dictionaryWords, statusCode, err := dictionaryWordRepo.List(word)
 	if err != nil {
 		return nil, statusCode, err

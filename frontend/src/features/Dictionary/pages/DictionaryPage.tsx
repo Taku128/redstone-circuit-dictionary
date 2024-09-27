@@ -1,22 +1,24 @@
-import React from 'react';
+import React from 'react'; 
 import Dictionary from '../../Dictionary/components/Dictionary';
-import './DictionaryPage.css'
+import './DictionaryPage.css'; 
 
 const DictionaryPage: React.FC = () => {
     return (
-        <div className='home'>
-            <div className="title-text-center">
-            <h1 className="font-ubuntu-medium">
-                Redstone Circuit Dictionary
-            </h1>
-            <p>
-                <span>ここはMinecraftのレッドストーン回路用語を</span><span>集めた場所</span><br />
-                <span>回路勢なら知っておきたい単語が</span><span>見つかるかも...?</span>
-            </p>
+        <div className='dictionary-home'>
+            <div className="dictionary-title-text-center"> 
+                <h1 className="font-ubuntu-medium"> 
+                    Redstone Circuit Dictionary
+                </h1>
+                <p>
+                    <span>ここはMinecraftのレッドストーン回路用語を</span>
+                    <span>集めた場所</span><br />
+                    <span>回路勢なら知っておきたい単語が</span>
+                    <span>見つかるかも...?</span>
+                </p>
             </div>
-            <Dictionary/>
+            <Dictionary /> 
         </div>
     );
 };
 
-export default DictionaryPage
+export default DictionaryPage; 

@@ -1,0 +1,303 @@
+openapi: 3.0.0
+info:
+  title: Redstone Circuit Dictionary API
+  description: "\n<hr /><h2 id=\"start_guide\">赤石辞書用語API</h2></p>\n<hr />
+                <h2 id=''>概要</h2><p>バックエンドとフロントエンドのデータの送受信の情報や規約についてまとめたAPI仕様書</p><ul><li>主にフロントエンド側の処理を作る際にデータの型や必要なクエリ・ヘッダー、レスポンスなどについて書かれている</li></ul>
+                <h2>フロントエンド側のコード</h2><h3>Reactコードの例</h3><pre><code>try {\n\tconst token = await UseFetchAuthSession();\n\tconst response = await fetch(endpoint + '/dev/dictionary', {\n\t\tmethod: 'POST',\n\t\theaders: {\n\t\t\t'Content-Type': 'application/json',\n\t\t\t'Authorization': `Bearer ${token}`,\n\t\t\t'x-processing-type1': 'dictionary_word',\n\t\t\t'x-processing-type2': 'create_dictionary_word',\n\t\t},\n\t\tbody: JSON.stringify(requestBody),\n\t\t});\n\t\tif (!response.ok) {\n\t\t\t//レスポンスのエラーを記載\n\t\t}\n\t\t//成功した場合の処理を記載\n\t\t} catch (error) {\n\t\t\t//送受信時の失敗のエラーを記載\n\t\t}\n};</code></pre>
+                <h3>変数</h3><table border=\"1\">\n  <tbody>\n    <tr>\n      <th style=\"padding: 10px\"><strong>変数名</strong></th>\n      <th style=\"padding: 10px\"><strong>説明</strong></th>\n    </tr>\n    <tr><td style=\"padding: 10px\">token</td><td style=\"padding: 10px\">Cognitoでのログインなどのセッション情報をもつトークン</td></tr>\n   <tr><td style=\"padding: 10px\">endpoint</td><td style=\"padding: 10px\">バックエンドに接続するためのエンドポイント(URL)</td></tr>\n    <tr><td style=\"padding: 10px\">x-processing-type1</td><td style=\"padding: 10px\">バックエンドで処理の種類を識別する</td></tr>\n  <tr><td style=\"padding: 10px\">x-processing-type2</td><td style=\"padding: 10px\">バックエンドで処理名を識別する</td></tr>\n  </tbody>\n</table>
+                <h3>Headerに必要な情報</h3><table border=\"1\">\n  <tbody>\n    <tr>\n      <th style=\"padding: 10px\"><strong>変数名</strong></th>\n      <th style=\"padding: 10px\"><strong>説明</strong></th>\n    </tr>\n    <tr><td style=\"padding: 10px\">Content-Type</td><td style=\"padding: 10px\">application/json : データのやり取りがJson形式であることを示す</td></tr>\n   <tr><td style=\"padding: 10px\">Authorization</td><td style=\"padding: 10px\">Bearer ${token}: セッション情報</td></tr>\n    <tr><td style=\"padding: 10px\">x-processing-type1</td><td style=\"padding: 10px\">バックエンドで処理の種類を識別する</td></tr>\n  <tr><td style=\"padding: 10px\">x-processing-type2</td><td style=\"padding: 10px\">バックエンドで処理名を識別する</td></tr>\n  </tbody>\n</table>
+                <h3>許可されているオリジン</h3><p>許可されたURL以外からリクエストを送るとエラーが出る</p><ul><li>本番環境 https://staging.d1631t3ap8rd8k.amplifyapp.com</li><li>開発環境(ローカル) http://localhost:3000</li></ul>
+                <h2>AWSから必要なデータを得るためのライブラリ一覧</h2>
+                <h3>Cognitoからユーザー情報やログイン状況を管理する <a href=\"https://www.npmjs.com/package/amazon-cognito-identity-js\">amazon-cognito-identity-js</a></h3><ul><li>CognitoUserSession</li><li>CognitoUserPool</li></ul>
+                <h3>セッション情報の取得、ログイン、サインアップ、サインアウトを行う <a href=\"https://docs.amplify.aws/react/build-a-backend/auth/set-up-auth/\">aws-amplify/auth</a></h3><ul><li>fetchAuthSession</li><li>signUp</li><li>signIn</li><li>signOut</li></ul>
+                <h3>Cognitoからユーザー情報やログイン状況を管理する <a href=\"https://docs.amplify.aws/gen1/react/how-amplify-works/\">aws-amplify</a></h3><ul><li>Amplify</li></ul>
+              "
+  version: 1.0.0
+
+servers:
+  - url: https://staging.d1631t3ap8rd8k.amplifyapp.com
+    description: prod環境
+  - url: http://localhost:3000
+    description: dev環境
+tags:
+  - name: Dictionary words
+    description: 赤石辞書
+paths:
+  /dictionary:
+    get:
+      tags:
+        - Dictionary words
+      summary: 赤石辞書用語の取得
+      description: <h2 id="">概要</h2><p>赤石辞書用語の取得を行う</p><ul><li>一度に取得できるデータは30件</li><li>今後ページング機能を追加する予定</li><li>ページング機能では前回最後に取得したデータを次の検索時に入力する</li></ul>
+      parameters:
+        - in: query
+          name: word
+          schema:
+            type: string
+          required: false
+          description: 取得時に検索するワード<br><ul><li>指定した場合は、入力した文字を含む赤石用語を取得する</li><li>空の場合は、全件取得</li><li>大文字・小文字・スペースを認識するので注意!</li></ul>
+        - in: header
+          name: x-processing-type1
+          schema:
+            type: string
+            example: dictionary_word
+          required: true
+          description: usecaseでの処理種類
+        - in: header
+          name: x-processing-type2
+          schema:
+            type: string
+            example: get_dictionary_word
+          required: true
+          description: usecaseでの処理名
+      responses:
+        '200':
+          description: Successful response with the dictionary word
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dictionaryResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+    post:
+      tags:
+        - Dictionary words
+      summary: 赤石辞書用語の作成
+      description: <h2 id="">概要</h2><p>赤石辞書用語の作成を行う</p><ul><li>一度に取得できるデータは30件</li><li>今後ページング機能を追加する予定</li><li>ページング機能では前回最後に取得したデータを次の検索時に入力する</li></ul>
+      parameters:
+        - in: header
+          name: x-processing-type1
+          schema:
+            type: string
+            example: dictionary_word
+          required: true
+          description: usecaseでの処理種類
+        - in: header
+          name: x-processing-type2
+          schema:
+            type: string
+            example: create_dictionary_word
+          required: true
+          description: usecaseでの処理名
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createAndUpdateDictionaryResponse'
+      responses:
+        '201':
+          description: Dictionary word created successfully
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+  /dictionary/{id}:
+    put:
+      tags:
+        - Dictionary words
+      summary: 赤石辞書用語の更新
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: 赤石辞書用語ID
+        - in: header
+          name: x-processing-type1
+          schema:
+            type: string
+            example: dictionary_word
+          required: true
+          description: usecaseでの処理種類
+        - in: header
+          name: x-processing-type2
+          schema:
+            type: string
+            example: update_dictionary_word
+          required: true
+          description: usecaseでの処理名
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createAndUpdateDictionaryResponse'
+      responses:
+        '200':
+          description: Dictionary word updated successfully
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+    delete:
+      tags:
+        - Dictionary words
+      summary: 赤石辞書用語の削除
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: 赤石辞書用語ID
+        - in: header
+          name: x-processing-type1
+          schema:
+            type: string
+            example: dictionary_word
+          required: true
+          description: usecaseでの処理種類
+        - in: header
+          name: x-processing-type2
+          schema:
+            type: string
+            example: delete_dictionary_word
+          required: true
+          description: usecaseでの処理名
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteDictionaryResponse'
+      responses:
+        '200':
+          description: Dictionary word deleted successfully
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+
+
+components:
+  schemas:
+    dictionaryResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          description: 用語のリスト (itemsはない)
+          items:
+            type: object
+            required:
+              - id
+              - word
+              - poster
+              - created_at
+            properties:
+              id:
+                type: integer
+                format: int
+                minimum: 0
+                description: 赤石辞書用語ID
+              word:
+                type: string
+                description: 赤石辞書用語
+              category_json:
+                type: string
+                format: json
+                description: JSON 形式の配列を含むカテゴリ
+              description:
+                type: string
+                description: 赤石辞書用語の説明
+              video_json:
+                type: string
+                format: json
+                description: JSON 形式の配列を含む動画リンク
+              poster:
+                type: string
+                description: 投稿者
+              created_at:
+                type: string
+                format: date-time
+                description: 最終更新時間
+      example:
+          - id: 250174841
+            word: "Carry Save Adder"
+            category_json: "[\"論理回路\",\"計算機\"]"
+            description: "繰り上がりを保存する...（所説）"
+            video_json: "[]"
+            poster: "user123"
+            created_at: "2024-09-09 00:18:25.707148879 +0900 JST"
+          - id: 786557129
+            word: "Ripple Carry Adder"
+            category_json: "[\"論理回路\",\"計算機\"]"
+            description: "繰り上がりのたびに遅延がある..."
+            video_json: "[]"
+            poster: "taku128"
+            created_at: "2024-09-08 14:20:20.70562244 +0900 JST"
+    createAndUpdateDictionaryResponse:
+      required:
+        - action_user
+        - cognito_session
+        - dictionary_word
+      type: object
+      properties:
+        action_user:
+          type: string
+          description: 実行ユーザ
+        cognito_session:
+          type: string
+          description: Cognitoから取得したユーザトークン
+        dictionary_word:
+          type: object
+          required:
+            - word
+            - poster
+          properties:
+            word:
+              type: string
+              description: 赤石辞書用語
+            category_json:
+              type: string
+              format: json
+              description: 赤石辞書用語,配列を文字列として使用している
+            description:
+              type: string
+              description: 赤石辞書用語の説明
+            video_json:
+              type: string
+              format: json
+              description: 赤石辞書用語,配列を文字列として使用している
+            poster:
+              type: string
+              description: 投稿者
+      example:
+        action_user: user123
+        cognito_session: sadMdwqc1NmwiLCJddwya2ljcHdhwergJvbWJgviopMW
+        dictionary_word:
+          word: "Carry Save Adder"
+          category_json: "[\"論理回路\",\"計算機\"]"
+          description: "繰り上がりを保存する...（所説）"
+          video_json: "[]"
+          poster: "user123"
+    deleteDictionaryResponse:
+      required:
+        - action_user
+        - cognito_session
+        - dictionary_word
+      type: object
+      properties:
+        action_user:
+          type: string
+          description: 実行ユーザ
+        cognito_session:
+          type: string
+          description: Cognitoから取得したユーザトークン
+        dictionary_word:
+          type: object
+          required:
+            - poster
+          properties:
+            poster:
+              type: string
+              description: 消す前に実行ユーザが投稿者かどうかを確かめる
+      example:
+        action_user: user123
+        cognito_session: sadMdwqc1NmwiLCJddwya2ljcHdhwergJvbWJgviopMW
+        dictionary_word:
+          poster: "user123"

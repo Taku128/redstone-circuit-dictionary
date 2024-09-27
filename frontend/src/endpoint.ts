@@ -1,4 +1,2 @@
-const endpoint = 'https://gn2nsx6lu3.execute-api.ap-northeast-1.amazonaws.com'
-
-
+const endpoint = process.env.REACT_APP_API_ENDPOINT || 'default-client-id'
 export default endpoint

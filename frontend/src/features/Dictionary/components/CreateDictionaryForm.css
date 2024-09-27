@@ -1,0 +1,101 @@
+.create-dictionary {
+    min-width: 700px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 20px auto;
+    width: 40%;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.create-dictionary h1 {
+    color: black;
+}
+
+.create-dictionary p {
+    text-align: left;
+    margin: 2px;
+    font-size: 1.2em;
+}
+
+.create-dictionary form {
+    display: grid;
+    width: 70%;
+}
+
+.create-dictionary input {
+    margin: 10px 5px;
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.create-dictionary-input-description {
+    width: 105% !important;
+    font-family: Arial, sans-serif;
+    padding: .375rem .75rem;
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    overflow: hidden;
+    box-sizing: border-box;
+    resize: none;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    margin: 10px 0;
+}
+
+.create-dictionary-form button {
+    max-width: 200px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    align-self: center;
+    text-align: center;
+    margin: 10px auto; 
+    display: block;
+}
+
+.create-dictionary-form button:hover {
+    background-color: #45a049;
+}
+
+.save-dictionary-button {
+    width: 25% !important;
+    max-width: 200px !important;
+    background-color: #007bff;
+}
+
+.save-dictionary-button:hover {
+    background-color: #0056b3 !important;
+}
+
+
+.response-message {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+}
+
+.authorizedMode {
+    align-self: center;
+    text-align: center;
+}
+
+.saveOrReset {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

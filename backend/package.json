@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "serverless-dotenv-plugin": "^6.0.0"
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-plugin-scripts": "^1.0.2"
   }
 }

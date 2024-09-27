@@ -1,8 +1,6 @@
 const awsConfiguration = {
-    region: 'ap-northeast-1',
-    UserPoolId: 'ap-northeast-1_uC9D1p0XQ',
-    ClientId: 'm4fna12g1g56l2kicprombi1l',
+    region: process.env.REACT_APP_AWS_REGION || 'default-region',
+    UserPoolId: process.env.REACT_APP_AWS_USER_POOL_ID || 'default-user-pool-id',
+    ClientId: process.env.REACT_APP_AWS_CLIENT_ID || 'default-client-id',
 }
-  
-export default awsConfiguration
-  
+export default awsConfiguration;

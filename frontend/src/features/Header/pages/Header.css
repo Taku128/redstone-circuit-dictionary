@@ -1,127 +1,86 @@
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #2c2c2c;
-    border-bottom: 1px solid #dee2e6;
-  }
+.header-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #2c2c2c;
+  border-bottom: 1px solid #dee2e6;
+}
 
-  @media (max-width: 768px) {
-    header {
-      flex-direction: column; 
-      align-items: center;
-    }
-    a {
-      margin: 15px 0px;
-    }
-  }
-  
-  h1 {
-    margin: 0;
-    color: white;
-  }
-  
-  form {
-    display: flex;
+.login{
+  display: flex;
+  align-items:center;
+  justify-content: space-between;
+  max-width: 250px;
+  width: 30%;
+}
+
+@media (max-width: 768px) {
+  .header-header {
+    flex-direction: column;
     align-items: center;
   }
-  
-  .main-header input {
-    padding: 5px;
-    margin-right: 10px;
-    min-width: 120px;
-    border: 2px solid #ced4da;
-    border-radius: 4px;
+
+  .header-home-button, 
+  .header-search-button, 
+  .header-form {
+    margin: 10px 0; /* 上下の間隔を広げる */
   }
 
-  .main-header input:focus {
-    border: 2px solid #ccdbeb;
-    outline-color: #a7a7a7;
-    background-color: #f4f8fc;
-  }
-
-  .main-header form{
-    max-width: 500px;
-    width: 30%;
-  }
-  
-  .home-button {
-    margin-right: 10px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    text-decoration: none;
-    list-style: none;
-    margin-right: 30px;
-    display: inline-block;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-  }
-
-  .home-button:hover{
-    background-color: #294cc2;
-  }
-
-  button {
-    margin-right: 10px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-  }
-
-  .button:hover{
-    background-color: #294cc2;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-
-  select {
+  .header-form {
     display: flex;
+    flex-direction: column; /* 入力フィールドとボタンを縦並びに */
+    align-items: center; /* 真ん中に配置 */
+    width: 100%; /* 横幅を100%に設定 */
   }
 
-  button.toggle-button {
-    background-color: #38a5a8;
-    font-size: 1.5em;
-  }
-  
-  button.toggle-button:hover {
-    background-color: #1077a0;
-  }
-  
-  header.header-toggled button.toggle-button {
-    background-color: #b052e2;
-    font-size: 1.5em;
-  }
-  
-  header.header-toggled button.toggle-button:hover {
-    background-color: #9233c5;
-  }
-  
-  .version-selector {
-    display: flex;
-    align-items: center;
-  }
-  
-  .version-selector label {
-    margin-right: 10px;
-    color: white;
-  }
-  
-  .version-selector select {
-    padding: 5px;
-    margin-right: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
+  .header-input {
+    width: 80%; /* 入力フィールドを中央に保つ */
+    margin-bottom: 2px; /* ボタンとの間隔を設定 */
   }
 
-  .search-button {
-    min-width: 90px;
-    margin-right: 40px;
+  .header-search-button {
+    width: 80%; /* ボタンも入力フィールドに揃えて中央に配置 */
   }
+}
+
+.header-form {
+  display: flex;
+  align-items: center;
+  max-width: 500px;
+  width: 30%;
+}
+
+.header-input {
+  padding: 5px;
+  margin-right: 10px;
+  min-width: 200px;
+  border: 2px solid #ced4da;
+  border-radius: 4px;
+}
+
+.header-input:focus {
+  border: 2px solid #ccdbeb;
+  background-color: #f4f8fc;
+}
+
+.header-home-button, .header-search-button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  background-color: #007bff;
+  text-align: center;
+  min-width: 100px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.header-home-button:hover, .header-search-button:hover {
+  background-color: #294cc2;
+}
+
+.header-search-button {
+  min-width: 90px;
+  margin-right: 40px;
+}

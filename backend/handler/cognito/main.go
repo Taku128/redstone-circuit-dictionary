@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -24,10 +23,8 @@ type CognitoEvent struct {
 func handler(ctx context.Context, event CognitoEvent) (CognitoEvent, error) {
 	// サインアップに成功したユーザを自動承認する
 	if event.TriggerSource == "PreSignUp_SignUp" {
-		log.Printf("Auto-confirming user: %s", event.UserName)
 		event.Response.AutoConfirmUser = true
 	}
-	log.Printf("Event: %+v", event)
 	return event, nil
 }
 

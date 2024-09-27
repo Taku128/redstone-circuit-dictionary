@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { CognitoUserPool,CognitoUserSession } from 'amazon-cognito-identity-js';
-import UseFetchAuthSession from '../hooks/useFetchAuthSession';
+import useFetchAuthSession from '../hooks/useFetchAuthSession';
 import awsConfiguration from '../../../awsConfiguration';
 import endpoint from '../../../endpoint';
 
@@ -11,6 +11,16 @@ const userPool = new CognitoUserPool({
 
 const useDeleteDictionaryData = () => {
   const [responseMessage, setResponseMessage] = useState('');
+  const [session, setSession] = useState<CognitoUserSession | null>(null);
+
+        useEffect(() => {
+          const FetchSession = async () => {
+            const fetchedSession = await useFetchAuthSession(userPool);
+            setSession(fetchedSession);
+          };
+          
+          FetchSession();
+        }, []);
 
   const deleteDictionaryData = useCallback(async (id: number, poster: string, onSuccess: () => void) => {
         let username = '';
@@ -61,13 +71,12 @@ const useDeleteDictionaryData = () => {
         };
 
         try {
-            const token = await UseFetchAuthSession();
             const response = await fetch(endpoint + `/dev/dictionary/${id}`, {
               credentials: 'include',
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${session}`,
                 'x-processing-type1': 'dictionary_word',
                 'x-processing-type2': 'delete_dictionary_word',
               },
