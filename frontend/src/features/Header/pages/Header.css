@@ -7,6 +7,14 @@
   border-bottom: 1px solid #dee2e6;
 }
 
+.login{
+  display: flex;
+  align-items:center;
+  justify-content: space-between;
+  max-width: 250px;
+  width: 30%;
+}
+
 @media (max-width: 768px) {
   .header-header {
     flex-direction: column;
@@ -62,6 +70,8 @@
   border-radius: 4px;
   text-decoration: none;
   background-color: #007bff;
+  text-align: center;
+  min-width: 100px;
   color: #fff;
   cursor: pointer;
 }

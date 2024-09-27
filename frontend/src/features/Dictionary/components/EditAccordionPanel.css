@@ -1,185 +1,215 @@
-.accordion-panel {
-    margin: 20px;
-    border-radius: 20px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    width: 100%;
-    max-width: 40em;
-    position: relative;
+.edit-accordion-panel {
+  margin: 20px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 40em;
+  position: relative;
   }
   
-  .accordion-header {
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
+.edit-accordion-header {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
 
-  .accordion-button{
-    display: flex;
-  }
+.edit-accordion-button{
+  display: flex;
+}
 
-  .accordion-header:hover {
-    background-color: #e5e6eb;
-  }
+.edit-accordion-header:hover {
+  background-color: #e5e6eb;
+}
 
-  .accordion-header.no-hover:hover {
-    background-color: transparent; /* ボタン上ではホバー効果を無効に */
-  }
+.edit-accordion-header.no-hover:hover {
+  background-color: transparent; /* ボタン上ではホバー効果を無効に */
+}
 
-  .accordion-header-test {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.edit-accordion-header-test {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-  .category-je{
-    margin-top: 5px;
-    color: white;
-    background-color: rgb(61, 168, 93);
-    padding: 2px 12px;
-    border-radius: 20px;
-    font-size: 0.8em;
-    cursor: pointer;
-    display: block;
-    text-align: left;
-    margin-right:10px;
-  }
+.edit-accordion-category-je{
+  margin-top: 5px;
+  color: white;
+  background-color: rgb(61, 168, 93);
+  padding: 2px 12px;
+  border-radius: 20px;
+  font-size: 0.8em;
+  cursor: pointer;
+  display: block;
+  text-align: left;
+  margin-right:10px;
+}
 
-  .accordion-p{
-    margin: 10px;
-    text-align: left;
-    font-size: 1.2em;
-    font-family: "Noto Sans JP", sans-serif;
-  }
+.edit-accordion-p{
+  margin: 10px;
+  text-align: left;
+  font-size: 1.2em;
+  font-family: "Noto Sans JP", sans-serif;
+}
 
-  .accordion-header h2 {
-    margin: 0;
-    font-size: 2em;
-    text-align: left;
-  }
+.edit-accordion-header h2 {
+  margin: 0;
+  font-size: 2em;
+  text-align: left;
+}
   
-  .accordion-toggle {
-    background: none;
-    border: none;
-    font-size: 2em;
-    cursor: pointer;
-    color: #3a3c3f;
-  }
+.edit-accordion-toggle {
+  background: none;
+  border: none;
+  font-size: 2em;
+  cursor: pointer;
+  color: #3a3c3f;
+}
 
-  .accordion-toggle:hover {
-    background: none;
-  }
-  
-  .accordion-content {
-    padding: 10px;
-    background-color: white;
-    flex-direction: column;
-    align-items: center;
-    transition: max-height 0.3s ease-out;
-  }
-  
-  .accordion-content.open {
-    max-height: 500px; /* Adjust this value as needed */
-    transition: max-height 0.3s ease-in;
-  }
+.edit-accordion-toggle:hover {
+  background: none;
+}
 
-  .accordion-image {
-    height: auto;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    max-width: 600px;
-  }
-  
-  .navigate-button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .navigate-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .accordion-category{
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
+.edit-accordion-content {
+  padding: 10px;
+  background-color: white;
+  flex-direction: column;
+  align-items: center;
+  transition: max-height 0.3s ease-out;
+}
 
-  .accordion-videos{
-    text-align: center;
-    display: grid;
-  }
+.edit-accordion-content.open {
+  max-height: 500px; /* Adjust this value as needed */
+  transition: max-height 0.3s ease-in;
+}
 
-  .accordion-delete{
-    margin-top: 10px;
-    background-color: rgb(231, 93, 93);
-    width: 80px;
-    height: 40px;
-  }
+.edit-accordion-image {
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  max-width: 600px;
+}
 
-  .accordion-delete:hover{
-    background-color: rgb(163, 48, 48);
-  }
+.navigate-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
 
-  .accordion-edit{
-    background-color: rgb(47, 170, 53);
-    width: 80px;
-    height: 40px;
-  }
+.navigate-button:hover {
+  background-color: #0056b3;
+}
 
-  .accordion-edit:hover{
-    background-color: rgb(23, 105, 27);
-  }
+.edit-accordion-category{
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
 
+.edit-accordion-videos{
+  text-align: center;
+  display: grid;
+}
 
+.edit-accordion-button{
+  display: flex;
+}
 
+.edit-accordion-actions{
+  min-width: 200px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.edit-accordion-delete{
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  margin: 10px auto;
+
+  margin-top: 10px;
+  background-color: rgb(231, 93, 93);
+  width: 80px;
+  height: 40px;
+}
+
+.edit-accordion-delete:hover{
+  background-color: rgb(163, 48, 48);
+}
+
+.edit-accordion-edit{
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  margin: 10px auto;
+
+  background-color: rgb(47, 170, 53);
+  width: 80px;
+  height: 40px;
+}
+
+.edit-accordion-edit:hover{
+  background-color: rgb(23, 105, 27);
+}
+
+.save-dictionary-button {
+  width: 25% !important;
+  max-width: 200px !important;
+  background-color: #007bff !important;
+}
+
+.save-dictionary-button:hover {
+  background-color: #0056b3 !important;
+}
 
 
 .edit-form{
-    min-width: 700px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    margin: 10px auto;
-    width: 70%;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  min-width: 700px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 10px auto;
+  width: 70%;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 } 
 
 .edit-form h1{
-    color: black;
+  color: black;
 }
 
 .edit-form input{
-    margin: 15px 5px;
-    display: block;
-    width: 70%;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
+  margin: 15px 5px;
+  display: block;
+  width: 70%;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 
 .category-input-group input{
   margin: 15px 5px;
-    display: block;
-    width: 70%;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
+  display: block;
+  width: 70%;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .category-input-group{
@@ -197,19 +227,19 @@
 }
 
 .edit-form textarea{
-    width: 75% !important;
-    font-family: Arial, sans-serif;
-    padding: .375rem .75rem;
-    background-color: #fafafa;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    overflow: hidden;
-    box-sizing: border-box;
-    resize: none;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    margin: 10px 0;
+  width: 75% !important;
+  font-family: Arial, sans-serif;
+  padding: .375rem .75rem;
+  background-color: #fafafa;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  overflow: hidden;
+  box-sizing: border-box;
+  resize: none;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 10px 0;
 }
 
 .accordion-content {
@@ -246,176 +276,176 @@
 }
 
 .add-button {
-    max-width: 150px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    align-self: center;
-    text-align: center;
-    margin: 10px auto; 
-    display: block;
-  }
+  max-width: 150px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  align-self: center;
+  text-align: center;
+  margin: 10px auto; 
+  display: block;
+}
 
 
-  .add-button:hover {
-    background-color: #45a049;
-  }
+.add-button:hover {
+  background-color: #45a049;
+}
 
-  .form-actions{
-    margin: 20px auto;
-    width: 80%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.form-actions{
+  margin: 20px auto;
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .save-button{
-    background-color: #007bff;
-    width: 30%;
-    padding: 10px;
-    margin: 5px auto;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
+.save-button{
+  background-color: #007bff;
+  width: 30%;
+  padding: 10px;
+  margin: 5px auto;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
 
-  .save-button:hover{
-    background-color: #0056b3 !important;
-    width: 30%;
-    padding: 10px;
-    margin: 5px auto;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
+.save-button:hover{
+  background-color: #0056b3 !important;
+  width: 30%;
+  padding: 10px;
+  margin: 5px auto;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
 
-  .cancel-button{
-    background-color: #007bff;
-    width: 30%;
-    padding: 10px;
-    margin: 5px auto;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
+.cancel-button{
+  background-color: #007bff;
+  width: 30%;
+  padding: 10px;
+  margin: 5px auto;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
 
-  .cancel-button:hover{
-    background-color: #0056b3 !important;
-    width: 30%;
-    padding: 10px;
-    margin: 5px auto;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
+.cancel-button:hover{
+  background-color: #0056b3 !important;
+  width: 30%;
+  padding: 10px;
+  margin: 5px auto;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
 
 
-  
+
 .edit-dictionary {
-    min-width: 700px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    margin: 20px auto;
-    width: 40%;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  min-width: 700px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 20px auto;
+  width: 40%;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .edit-dictionary h1 {
-    color: black;
+  color: black;
 }
 
 .edit-dictionary p {
-    text-align: left;
-    margin: 2px;
-    font-size: 1.2em;
+  text-align: left;
+  margin: 2px;
+  font-size: 1.2em;
 }
 
 .edit-dictionary form {
-    display: grid;
-    width: 70%;
+  display: grid;
+  width: 70%;
 }
 
 .edit-dictionary input {
-    margin: 10px 5px;
-    display: block;
-    width: 100%;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
+  margin: 10px 5px;
+  display: block;
+  width: 100%;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .edit-dictionary-input-description {
-    width: 105% !important;
-    font-family: Arial, sans-serif;
-    padding: .375rem .75rem;
-    background-color: #fafafa;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    overflow: hidden;
-    box-sizing: border-box;
-    resize: none;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    margin: 10px 0;
+  width: 105% !important;
+  font-family: Arial, sans-serif;
+  padding: .375rem .75rem;
+  background-color: #fafafa;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  overflow: hidden;
+  box-sizing: border-box;
+  resize: none;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 10px 0;
 }
 
 .edit-dictionary-form button {
-    max-width: 200px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    align-self: center;
-    text-align: center;
-    margin: 10px auto; 
-    display: block;
+  max-width: 200px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  align-self: center;
+  text-align: center;
+  margin: 10px auto; 
+  display: block;
 }
 
 .edit-dictionary-form button:hover {
-    background-color: #45a049;
+  background-color: #45a049;
 }
 
 .save-dictionary-button {
-    width: 25% !important;
-    max-width: 200px !important;
-    background-color: #007bff;
+  width: 25% !important;
+  max-width: 200px !important;
+  background-color: #007bff;
 }
 
 .save-dictionary-button:hover {
-    background-color: #0056b3 !important;
+  background-color: #0056b3 !important;
 }
 
 
 .response-message {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
 }
 
 .authorizedMode {
-    align-self: center;
-    text-align: center;
+  align-self: center;
+  text-align: center;
 }
 
 .saveOrReset {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

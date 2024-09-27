@@ -35,7 +35,7 @@ const AccordionPanel: React.FC<AccordionPanelProps> = ({ word, categories, video
           <h2>{word}</h2> 
           <div className="accordion-category">
             {categories.map((category: string, index: number) => (
-              <span key={index} className='category-je'>{category}</span>
+              <span key={index} className='accordion-category-je'>{category}</span>
             ))}
           </div>
         </div>

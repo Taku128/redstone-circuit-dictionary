@@ -35,7 +35,11 @@ const useSearchDictionaryWord = () => {
     }
   };
 
-  return { searchQuery, handleSearchChange, handleSearchSubmit };
+  const resetSearchQuery = () => {
+    setSearchQuery(''); // クエリをリセット
+  };
+
+  return { searchQuery, handleSearchChange, handleSearchSubmit, resetSearchQuery };
 };
 
 export default useSearchDictionaryWord;

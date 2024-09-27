@@ -20,7 +20,13 @@
   background-color: #e5e6eb; 
 }
 
-.category-je {
+.accordion-category {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.accordion-category-je {
   margin-top: 5px;
   color: white;
   background-color: rgb(61, 168, 93); 

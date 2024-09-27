@@ -1,4 +1,4 @@
-import DictionaryForm from '../components/CreateDictionaryForm';
+import CreateDictionaryForm from '../components/CreateDictionaryForm';
 import useCreateDictionary from '../hooks/useCreatDictionary';
 
 // 入力画面から得たデータ
@@ -36,7 +36,7 @@ const CreateDictionaryPage = () => {
 
   return (
     <div>
-      <DictionaryForm 
+      <CreateDictionaryForm 
         handleSubmit={submitForm} 
         resetForm={resetForm} 
         responseMessage={responseMessage} 

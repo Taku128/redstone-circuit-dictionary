@@ -3,7 +3,7 @@ import { CognitoUserPool,CognitoUserSession } from 'amazon-cognito-identity-js';
 import useFetchAuthSession from '../hooks/useFetchAuthSession';
 import awsConfiguration from '../../../awsConfiguration';
 import endpoint from '../../../endpoint';
-import { UpdateDictionaryItemProps } from '../components/EditDictionary';
+import { UpdateDictionaryItemProps } from '../pages/EditDictionaryPage';
 
 const userPool = new CognitoUserPool({
     UserPoolId: awsConfiguration.UserPoolId,
@@ -94,6 +94,7 @@ const useUpdateDictionaryData = () => {
               console.error('Error update data', errorText);
               throw new Error(`Error update data: ${errorText}`);
             }
+            onSuccess();
             setResponseMessage('Data update successfully');
           } catch (error) {
             console.error('Failed to fetch', error);

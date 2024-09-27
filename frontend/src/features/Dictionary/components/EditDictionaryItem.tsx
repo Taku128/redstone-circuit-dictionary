@@ -1,8 +1,5 @@
 import React from 'react';
 import EditAccordionPanel from './EditAccordionPanel';
-import useDeleteDictionaryData from '../hooks/useDeleteDictionary';
-import useUpdateDictionaryData from '../hooks/useUpdateDictionary';
-import { UpdateDictionaryItemProps } from './EditDictionary';
 
 export interface EditDictionaryItemProps {
   id: number;
@@ -20,32 +17,19 @@ interface EditDictionaryItemComponentProps {
   item: EditDictionaryItemProps;
   onDelete: (id: number, poster: string) => void;
   onEdit: (id: number, poster: string, updatedData: { word: string; categories: string[]; videos: string[]; description: string; }) => void;
+  responseMessage: string;
 }
 
-const EditDictionaryItem: React.FC<EditDictionaryItemComponentProps> = ({ item, onDelete, onEdit }) => {
-  const { deleteDictionaryData } = useDeleteDictionaryData();
-  const { updateDictionaryData, responseMessage } = useUpdateDictionaryData();
-
+const EditDictionaryItem: React.FC<EditDictionaryItemComponentProps> = ({ item, onDelete, onEdit, responseMessage }) => {
   const parsedCategories: string[] = JSON.parse(item.category_json);
   const parsedImageUrls: string[] = JSON.parse(item.video_json);
 
-  const handleDelete = async (id: number, poster: string) => {
-    await deleteDictionaryData(id,poster, () => {
-      onDelete(id, poster);
-    });
+  const handleDelete = (id: number, poster: string) => {
+    onDelete(id, poster);
   };
 
-  const handleEdit = async (id: number, poster: string, updatedData: { word: string; categories: string[]; videos: string[]; description: string; }) => {
-    const updatedFormData: UpdateDictionaryItemProps = {
-      word: updatedData.word,
-      description: updatedData.description,
-      category_json: JSON.stringify(updatedData.categories.filter(category => category.trim() !== '')),
-      video_json: JSON.stringify(updatedData.videos.filter(video => video.trim() !== '')),
-    };
-    
-    await updateDictionaryData(id,poster,updatedFormData,() =>{
-      onEdit(id,poster,updatedData)
-    });
+  const handleEdit = (id: number, poster: string, updatedData: { word: string; categories: string[]; videos: string[]; description: string; }) => {
+    onEdit(id,poster,updatedData)
   };
 
   return (
@@ -55,10 +39,11 @@ const EditDictionaryItem: React.FC<EditDictionaryItemComponentProps> = ({ item, 
       Categories={parsedCategories}
       Videos={parsedImageUrls}
       Description={item.description}
-      CreatedAt={item.created_at} // Pass created_at to EditAccordionPanel
+      CreatedAt={item.created_at} 
       Poster={item.poster}
       onDelete={() => handleDelete(item.id,item.poster)}
-      onEdit={handleEdit} // Pass the handleEdit function
+      onEdit={handleEdit} 
+      ResponseMessage={responseMessage}
     />
   );
 };
