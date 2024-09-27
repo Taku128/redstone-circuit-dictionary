@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './DictionaryForm.css'; 
+import './CreateDictionaryForm.css'; 
 
 interface DictionaryFormProps {
     handleSubmit: (formData: any) => void;
@@ -58,12 +58,16 @@ const DictionaryForm: React.FC<DictionaryFormProps> = ({ handleSubmit, resetForm
     <div className={'create-dictionary'}>
       <h1>赤石回路用語の追加</h1>
       <form className={'create-dictionary-form'} onSubmit={submitForm}>
+        <p className='p'>用語</p>
         <input className={'create-dictionary-input'} type="text" name="word" value={formData.word} onChange={handleChange} placeholder="単語を入力" />
+        <p className='p'>説明</p>
         <textarea className={'create-dictionary-input-description'} name="description" value={formData.description} onChange={handleChange} placeholder="説明を入力" />
+        <p className='p'>カテゴリー</p>
         {categories.map((category, idx) => (
           <input key={idx} type="text" value={category} onChange={(e) => handleCategoryChange(e, idx)} placeholder="カテゴリを入力" />
         ))}
-        <button type="button" onClick={addCategoryInput}>カテゴリの追加</button>
+        <button type="button" onClick={addCategoryInput}>カテゴリーの追加</button>
+        <p className='p'>YouTube URL</p>
         {videos.map((video, idx) => (
           <input key={idx} type="text" value={video} onChange={(e) => handleVideoChange(e, idx)} placeholder="YoutubeのURLを入力" />
         ))}
@@ -73,7 +77,7 @@ const DictionaryForm: React.FC<DictionaryFormProps> = ({ handleSubmit, resetForm
           <button type="button" onClick={resetFormHandler}>リセット</button>
         </div>
       </form>
-      <div className={'response-message'}>{responseMessage}</div>
+      {responseMessage && <div className='response-message'>{responseMessage}</div>}
     </div>
   );
 };

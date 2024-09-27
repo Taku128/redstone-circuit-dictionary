@@ -1,5 +1,5 @@
 import React from 'react';
-import AccordionPanel from './AccordionPanel';
+import AccordionPanel from './DictionaryAccordionPanel';
 
 export interface DictionaryItemProps {
   id: number;

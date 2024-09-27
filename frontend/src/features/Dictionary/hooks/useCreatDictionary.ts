@@ -10,7 +10,7 @@ const userPool = new CognitoUserPool({
   ClientId: awsConfiguration.ClientId,
 });
 
-const useDictionarySubmit = (resetForm: () => void) => {
+const useDictionarySubmit = (onSuccess: () => void) => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [session, setSession] = useState<CognitoUserSession | null>(null);
 
@@ -22,7 +22,56 @@ const useDictionarySubmit = (resetForm: () => void) => {
     fetchSession();
   }, []);
 
-  const handleSubmit = async (requestBody: DictionaryWordFormData) => {
+  const handleSubmit = async (input: DictionaryWordFormData) => {
+    // 実行ユーザの確認、username、cognitoSessionの取得
+    var username: string = '';
+    var cognitoSession: string = '';
+    const cognitoUser = userPool.getCurrentUser();
+    if (cognitoUser) {
+      try {
+        const session = await new Promise<CognitoUserSession>((resolve, reject) => {
+          cognitoUser.getSession((err: Error | null, session: CognitoUserSession | null) => {
+            if (err) {
+              reject(err);
+            } else if (session) {
+              resolve(session);
+            } else {
+              reject(new Error('Failed Get Session'));
+            }
+          });
+        });
+
+        if (session.isValid()) {
+          cognitoSession = session.getAccessToken().getJwtToken();
+          username = cognitoUser.getUsername();
+        }
+        else {
+          console.log('Session Is Not Valid');
+          return;
+        }
+      } catch (error) {
+        console.error('Error getting user session', error);
+        setResponseMessage('Failed Get User');
+        return;
+      }
+    } 
+    if (!username){
+      console.log('No cognito user found');
+      setResponseMessage('No Cognito user found');
+      return
+    }
+
+    const dictionaryWord = {
+      ...input,
+      poster: username,
+    };
+
+    // 実行ユーザとSessionの情報を追加、バックエンドでの検証用
+    const requestBody = {
+      action_user: username,
+      cognito_session: cognitoSession,
+      dictionary_word: dictionaryWord,
+    };
 
     try {
       const response = await fetch(`${endpoint}/dev/dictionary`, {
@@ -42,7 +91,7 @@ const useDictionarySubmit = (resetForm: () => void) => {
         throw new Error(`Error saving data: ${errorText}`);
       }
 
-      resetForm();
+      onSuccess();
       console.log('Data saved successfully');
       setResponseMessage('Data saved successfully');
     } catch (error) {
@@ -51,7 +100,11 @@ const useDictionarySubmit = (resetForm: () => void) => {
     }
   };
 
-  return { handleSubmit, responseMessage };
+  const clearResponseMessage = () => {
+    setResponseMessage('');
+  };
+
+  return { handleSubmit, responseMessage, clearResponseMessage };
 };
 
 export default useDictionarySubmit;

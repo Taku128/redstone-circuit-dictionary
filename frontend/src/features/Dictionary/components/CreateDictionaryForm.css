@@ -17,7 +17,7 @@
 
 .create-dictionary p {
     text-align: left;
-    margin: 5px;
+    margin: 2px;
     font-size: 1.2em;
 }
 
@@ -27,7 +27,7 @@
 }
 
 .create-dictionary input {
-    margin: 15px 5px;
+    margin: 10px 5px;
     display: block;
     width: 100%;
     padding: .375rem .75rem;
@@ -71,16 +71,15 @@
 }
 
 .save-dictionary-button {
+    width: 25% !important;
+    max-width: 200px !important;
     background-color: #007bff;
 }
 
-.save-button:hover {
+.save-dictionary-button:hover {
     background-color: #0056b3 !important;
 }
 
-button[type="submit"]:hover {
-    background-color: #0056b3;
-}
 
 .response-message {
     margin-top: 20px;

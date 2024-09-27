@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import DictionaryForm from '../components/DictionaryForm';
-import useDictionarySubmit from '../hooks/useCreatDictionary';
+import DictionaryForm from '../components/CreateDictionaryForm';
+import useCreateDictionary from '../hooks/useCreatDictionary';
 
 // 入力画面から得たデータ
 interface DictionaryWordFormDataProps {
@@ -19,14 +18,7 @@ export interface DictionaryWordFormData {
 }
 
 const CreateDictionaryPage = () => {
-  const initialFormData: DictionaryWordFormData = {
-    word: '',
-    description: '',
-    category_json: '',
-    video_json: '',
-  };
-  const [formData, setFormData] = useState(initialFormData);
-  const { handleSubmit, responseMessage } = useDictionarySubmit(() => setFormData(formData));
+  const { handleSubmit, responseMessage, clearResponseMessage } = useCreateDictionary(() => {});
 
   const submitForm = async (data: DictionaryWordFormDataProps) => {
     const updatedFormData: DictionaryWordFormData = {
@@ -38,11 +30,15 @@ const CreateDictionaryPage = () => {
     await handleSubmit(updatedFormData);
   };
 
+  const resetForm = () => {
+    clearResponseMessage();
+  };
+
   return (
     <div>
       <DictionaryForm 
         handleSubmit={submitForm} 
-        resetForm={() => setFormData(initialFormData)} 
+        resetForm={resetForm} 
         responseMessage={responseMessage} 
       />
     </div>

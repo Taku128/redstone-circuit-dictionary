@@ -27,72 +27,28 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
   const contentRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [session, setSession] = useState<CognitoUserSession | null>(null);
 
-  const [editTitle, setEditTitle] = useState<string>(Word);
+  const [formData, setFormData] = useState({
+    word: Word,
+    description: Description,
+  });
   const [editCategories, setEditCategories] = useState<string[]>(Categories);
-  const [editImageUrls, setEditImageUrls] = useState<string[]>(Videos);
-  const [editDescription, setEditDescription] = useState<string>(Description);
-  const [editCreatedAt, setEditCreatedAt] = useState<string>(CreatedAt);
+  const [editVideos, setEditVideos] = useState<string[]>(Videos);
   const [responseMessage, setResponseMessage] = useState<string>('');
 
-
-  const togglePanel = () => {
-    if (!isHovering) {
-      setIsOpen(!isOpen);
-      if (!isOpen) setResponseMessage(''); // パネルを閉じたときにメッセージを消去
-    }
-  };
-
-  const handleEdit = () => {
-    adjustTextareaHeight();
-    setIsEditing(true);
-    setIsOpen(true); // Ensure the panel opens when editing starts
-  };
-
-  const handleCategoryChange = (index: number, value: string) => {
-    const updatedCategories = [...editCategories];
-    updatedCategories[index] = value;
-    setEditCategories(updatedCategories);
-  };
-
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (e.target instanceof HTMLTextAreaElement) {
-      e.target.style.height = 'auto'; 
-      e.target.style.height = `${e.target.scrollHeight}px`; 
-    }
-    setEditDescription(e.target.value);
-  };
-
-  const addCategoryInput = () => {
-    setEditCategories([...editCategories, '']);
-  };
-
-  const handleImageUrlChange = (index: number, value: string) => {
-    const updatedUrls = [...editImageUrls];
-    updatedUrls[index] = value;
-    setEditImageUrls(updatedUrls);
-  };
-
-  const addImageUrlInput = () => {
-    setEditImageUrls([...editImageUrls, '']);
-  };
-
+  // 時間を「2022-06-01」形式に変換
   const formatDateString = (dateString: string): { date: string; } => {
     try {
       // 正規表現で日付と時間部分を抽出
       const regex = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})\.\d+ \+\d{4} JST$/;
       const match = dateString.match(regex);
-      
       if (!match) {
         // 正規表現にマッチしない場合は元の文字列をそのまま返す
         return {
           date: dateString
         };
       }
-  
       const [_, datePart, timePart] = match;
-  
       // フォーマットを指定された形式に整形
       const formattedDate = `${datePart} ${timePart.substring(0, 5)}`;
   
@@ -108,100 +64,28 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
     }
   };
 
-  const getJSTISOString = () => {
-    const date = new Date();
-  
-    // 日本時間に調整
-    const jstOffset = 0 * 60; // JSTはUTC+9時間
-    const utcDate = new Date(date.getTime() + jstOffset * 60000);
-
-    // 年、月、日、時、分、秒、ナノ秒を取得
-    const year = utcDate.getFullYear();
-    const month = String(utcDate.getMonth() + 1).padStart(2, '0');
-    const day = String(utcDate.getDate()).padStart(2, '0');
-    const hours = String(utcDate.getHours()).padStart(2, '0');
-    const minutes = String(utcDate.getMinutes()).padStart(2, '0');
-    const seconds = String(utcDate.getSeconds()).padStart(2, '0');
-    
-    // ナノ秒は固定値を使用（JavaScriptのDateオブジェクトにはミリ秒までしかサポートされていない）
-    const nanoseconds = '000000000'; // 固定値として使用
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${nanoseconds} +0900 JST`;
-  };
-
-  const convertURLsToString = (urls: string[]): string => {
-    try {
-      // 配列をJSON形式の文字列に変換
-      const urlsString = JSON.stringify(urls);
-      return urlsString;
-    } catch (err) {
-      return '[]';
+  const togglePanel = () => {
+    if (!isHovering) {
+      setIsOpen(!isOpen);
+      if (!isOpen) setResponseMessage(''); // パネルを閉じたときにメッセージを消去
     }
   };
 
-  const isYoutubeURL = (url: URL): boolean => {
-    return url.hostname === 'www.youtube.com' || url.hostname === 'youtu.be';
-  };
-  
-  const isContainedEmbed = (url: URL): boolean => {
-    return url.pathname.includes('embed');
-  };
-
-  useEffect(() => {
-    const FetchSession = async () => {
-      const fetchedSession = await useFetchAuthSession(userPool);
-      setSession(fetchedSession);
-    };
-    
-    FetchSession();
-  }, []);
-  
-  const validateAndConvertURLs = (urls: string[]): string[] => {
-    const result: string[] = [];
-  
-    for (const v of urls) {
-      try {
-        const url = new URL(v);
-  
-        if (!isYoutubeURL(url)) {
-          return [];
-        }
-  
-        if (isContainedEmbed(url)) {
-          result.push(v);
-          continue;
-        }
-  
-        // 埋め込み式のURLに変換
-        let videoID = '';
-        if (url.hostname === 'www.youtube.com') {
-          videoID = url.searchParams.get('v') || '';
-          if (!videoID) {
-            return [];
-          }
-        } else if (url.hostname === 'youtu.be') {
-          videoID = url.pathname.substring(1);
-        }
-  
-        const embedURL = `https://www.youtube.com/embed/${videoID}`;
-        result.push(embedURL);
-      } catch (err) {
-        return [];
-      }
-    }
-  
-    return result;
-  };
+  // const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  //   if (e.target instanceof HTMLTextAreaElement) {
+  //     e.target.style.height = 'auto'; 
+  //     e.target.style.height = `${e.target.scrollHeight}px`; 
+  //   }
+  //   setEditDescription(e.target.value);
+  // };
 
   const handleSave = async () => {
     const updatedData = {
-      word: editTitle,
+      word: formData.word,
       categories: editCategories,
-      videos: editImageUrls,
-      description: editDescription,
-      created_at: getJSTISOString() // Update created_at with current timestamp
+      videos: editVideos,
+      description: formData.description,
     };
-    setEditCreatedAt(updatedData.created_at);
     try {
       const cognitoUser = userPool.getCurrentUser();
       if (cognitoUser) {
@@ -222,9 +106,10 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
           const username = cognitoUser.getUsername();
 
           const updatedFormData = {
-            ...updatedData,
+            word: updatedData.word,
+            description: updatedData.description,
             category_json: JSON.stringify(editCategories.filter(category => category.trim() !== '')),
-            video_json: JSON.stringify(editImageUrls.filter(video => video.trim() !== '')),
+            video_json: JSON.stringify(editVideos.filter(video => video.trim() !== '')),
             poster: username,
           };
 
@@ -250,10 +135,7 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
             console.error('Error saving data', errorText);
             throw new Error(`Error saving data: ${errorText}`);
           }
-          const videos = validateAndConvertURLs(updatedData.videos);
-          updatedFormData.video_json = convertURLsToString(videos);
           console.log(updatedFormData)
-          onEdit(ID, updatedFormData);
           setResponseMessage('Data saved successfully');
         } else {
           console.log('Session Is Not Valid');
@@ -270,13 +152,44 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
     adjustContentHeight();
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleEdit = () => {
+    adjustTextareaHeight();
+    setIsEditing(true);
+    setIsOpen(true); // Ensure the panel opens when editing starts
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    const updatedCategories = [...editCategories];
+    updatedCategories[idx] = e.target.value;
+    setEditCategories(updatedCategories);
+  };
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    const updatedVideos = [...editVideos];
+    updatedVideos[idx] = e.target.value;
+    setEditVideos(updatedVideos);
+  };
+
+  const addCategoryInput = () => {
+    setEditCategories([...editCategories, '']);
+  };
+
+  const addVideoInput = () => {
+    setEditVideos([...editVideos, '']);
+  };
+
   const handleCancel = () => {
     // Reset the values to their original state and exit edit mode
-    setEditTitle(Word);
     setEditCategories(Categories);
-    setEditImageUrls(Videos);
-    setEditDescription(Description);
-    setEditCreatedAt(CreatedAt); 
+    setEditVideos(Videos);
     setIsOpen(false);
     contentRef.current?.addEventListener('transitionend', () => {
       setIsEditing(false); // モーダルが閉じた後に編集モードを解除
@@ -305,16 +218,11 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
     if (contentRef.current) {
       contentRef.current.style.maxHeight = isOpen ? `${contentRef.current.scrollHeight}px` : "0px";
     }
-  }, [isOpen, isEditing, editCategories, editImageUrls, editDescription, responseMessage]);
+  }, [isOpen, isEditing, editCategories, editVideos, responseMessage]);
 
   return (
     <div className="accordion-panel">
-      <div 
-        className={`accordion-header ${isHovering ? 'no-hover' : ''}`} 
-        onClick={togglePanel} 
-        role="button" 
-        aria-expanded={isOpen ? "true" : "false"}
-      >
+      <div className={`accordion-header ${isHovering ? 'no-hover' : ''}`} onClick={togglePanel} role="button" aria-expanded={isOpen ? "true" : "false"}>
         <div className="accordion-header-text">
           <h2>{Word}</h2>
           <div className="accordion-category">
@@ -327,70 +235,37 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
           <button className={`accordion-toggle ${isOpen ? 'open' : ''}`} aria-label={isOpen ? 'Close panel' : 'Open panel'}>
             {isOpen ? '-' : '+'}
           </button>
-          <div 
-            className="accordion-actions" 
-            onMouseEnter={() => setIsHovering(true)} 
-            onMouseLeave={() => setIsHovering(false)}
-          >
-            <button className="accordion-edit" onClick={() => handleEdit()}>Edit</button>
-            <button className="accordion-delete" onClick={() => onDelete(ID,Poster)}>Delete</button>
+          <div className="accordion-actions" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+            <button className="accordion-edit" onClick={() => handleEdit()}>編集</button>
+            <button className="accordion-delete" onClick={() => onDelete(ID,Poster)}>削除</button>
           </div>
         </div>
       </div>
 
       <div ref={contentRef} className={`accordion-content ${isOpen ? 'open' : ''}`} aria-hidden={!isOpen}>
         {isEditing ? (
-          <div className="edit-form">
-            <h1>Word</h1>
-            <input 
-              type="text" 
-              value={editTitle} 
-              onChange={(e) => setEditTitle(e.target.value)} 
-              placeholder="Edit title" 
-            />
-            <h1>Category</h1>
-            {editCategories.length ? (
-              editCategories.map((category, index) => (
-                <div key={index} className='category-input-group'>
-                  <input
-                    type="text"
-                    placeholder={`Category ${index + 1}`}
-                    value={category}
-                    onChange={(e) => handleCategoryChange(index, e.target.value)}
-                  />
-                </div>
-              ))
-            ):(
-              <p>なし</p>
-            )}
-            <button type="button" onClick={addCategoryInput} className='add-button'>Add Category</button>
-            <h1>Description</h1>
-            <textarea
-              value={editDescription}
-              onChange={handleDescriptionChange}
-              placeholder="Edit description"
-            />
-            <h1>YouTube URL</h1>
-            {editImageUrls.length ? (
-            editImageUrls.map((url, index) => (
-              <div key={index} className='image-url-input-group'>
-                <input
-                  type="text"
-                  placeholder={`Image URL ${index + 1}`}
-                  value={url}
-                  onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                />
+          <div className={'edit-dictionary'}>
+            <h1>赤石回路用語の編集</h1>
+            <form className={'edit-dictionary-form'} onSubmit={handleSave}>
+              <p className='p'>用語</p>
+              <input className={'edit-dictionary-input'} type="text" name="word" value={formData.word} onChange={handleChange} placeholder="単語を入力" />
+              <p className='p'>説明</p>
+              <textarea className={'edit-dictionary-input-description'} name="description" value={formData.description} onChange={handleChange} placeholder="説明を入力" />
+              <p className='p'>カテゴリー</p>
+              {editCategories.map((category, idx) => (
+                <input key={idx} type="text" value={category} onChange={(e) => handleCategoryChange(e, idx)} placeholder="カテゴリを入力" />
+              ))}
+              <button type="button" onClick={addCategoryInput}>カテゴリーの追加</button>
+              <p className='p'>YouTube URL</p>
+              {editVideos.map((video, idx) => (
+                <input key={idx} type="text" value={video} onChange={(e) => handleVideoChange(e, idx)} placeholder="YoutubeのURLを入力" />
+              ))}
+              <button type="button" onClick={addVideoInput}>URLの追加</button>
+              <div className={'saveOrReset'}>
+                <button className={'save-dictionary-button'} type="submit">保存</button>
+                <button type="button" onClick={handleCancel}>キャンセル</button>
               </div>
-            ))
-          ):(
-            <p>なし</p>
-          )}
-            <button type="button" onClick={addImageUrlInput} className='add-button'>Add Video</button>
-
-            <div className='form-actions'>
-              <button className='save-button' onClick={handleSave}>Save</button>
-              <button className='cancel-button' onClick={handleCancel}>Cancel</button>
-            </div>
+            </form>
             {responseMessage && <div className='response-message'>{responseMessage}</div>}
           </div>
         ) : (
@@ -405,7 +280,7 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
               </div>
               ))}
             </div>
-            <p className='accordion-p'>更新日時: {formatDateString(editCreatedAt).date}</p>
+            <p className='accordion-p'>更新日時: {formatDateString(CreatedAt).date}</p>
           </>
         )}
       </div>

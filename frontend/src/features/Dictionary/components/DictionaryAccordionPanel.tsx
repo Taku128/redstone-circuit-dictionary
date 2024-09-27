@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './AccordionPanel.css';
+import './DictionaryAccordionPanel.css';
 
 interface AccordionPanelProps {
   word: string; 
