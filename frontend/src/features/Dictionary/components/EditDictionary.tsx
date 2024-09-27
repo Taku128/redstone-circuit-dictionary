@@ -4,11 +4,20 @@ import useDeleteDictionaryData from '../hooks/useDeleteDictionary';
 import EditDictionaryItem, { EditDictionaryItemProps } from './EditDictionaryItem';
 import Separator from './Separator';
 import './EditDictionary.css';
+import useUpdateDictionaryData from '../hooks/useUpdateDictionary';
+
+export interface UpdateDictionaryItemProps {
+  word: string;
+  description: string;
+  category_json: string; 
+  video_json: string; 
+}
 
 const EditDictionary: React.FC = () => {
   const dictionary = useEditDictionaryData();
   const [groupedDictionary, setGroupedDictionary] = useState<{ [key: string]: EditDictionaryItemProps[] }>({});
   const { deleteDictionaryData } = useDeleteDictionaryData();
+  const { updateDictionaryData, responseMessage } = useUpdateDictionaryData();
 
   useEffect(() => {
     if (dictionary.length === 0) return;
@@ -49,25 +58,32 @@ const EditDictionary: React.FC = () => {
     });
   };
 
-  const handleEdit = (id: number, updatedData: { word: string; categories: string[]; videos: string[]; description: string; created_at: string }) => {
-    // Update dictionary and grouped data on edit
-    const updatedDictionary = dictionary.map(item =>
-      item.id === id ? { ...item, ...updatedData } : item
-    );
-    setGroupedDictionary(
-      updatedDictionary.reduce((acc, item) => {
-        if (item.word && typeof item.word === 'string') {
-          const firstLetter = item.word[0].toUpperCase();
-          if (!acc[firstLetter]) {
-            acc[firstLetter] = [];
-          }
-          acc[firstLetter].push(item);
-        } else {
-          console.warn(`Invalid item encountered:`, item);
-        }
-        return acc;
-      }, {} as { [key: string]: EditDictionaryItemProps[] })
-    );
+  const handleEdit = (id: number, poster: string, updatedData: { word: string; categories: string[]; videos: string[]; description: string; }) => {    
+    const updatedFormData:UpdateDictionaryItemProps = {
+      word: updatedData.word,
+      description: updatedData.description,
+      category_json: JSON.stringify(updatedData.categories.filter(category => category.trim() !== '')),
+      video_json: JSON.stringify(updatedData.videos.filter(video => video.trim() !== '')),
+    };
+
+    updateDictionaryData(id,poster,updatedFormData, ()=>{
+      // if (dictionary.length === 0) return;
+
+      // const groupedData = dictionary.reduce((acc, item) => {
+      //   if (item.word && typeof item.word === 'string') {
+      //     const firstLetter = item.word[0].toUpperCase();
+      //     if (!acc[firstLetter]) {
+      //       acc[firstLetter] = [];
+      //     }
+      //     acc[firstLetter].push(item);
+      //   } else {
+      //     console.warn(`Invalid item encountered:`, item);
+      //   }
+      //   return acc;
+      // }, {} as { [key: string]: EditDictionaryItemProps[] });
+
+      // setGroupedDictionary(groupedData);
+    });
   };
 
   return (

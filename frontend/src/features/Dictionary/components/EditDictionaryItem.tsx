@@ -1,6 +1,8 @@
 import React from 'react';
 import EditAccordionPanel from './EditAccordionPanel';
 import useDeleteDictionaryData from '../hooks/useDeleteDictionary';
+import useUpdateDictionaryData from '../hooks/useUpdateDictionary';
+import { UpdateDictionaryItemProps } from './EditDictionary';
 
 export interface EditDictionaryItemProps {
   id: number;
@@ -11,17 +13,18 @@ export interface EditDictionaryItemProps {
   poster: string;
   created_at: string;
   onDelete: (id: number, poster: string) => void; 
-  onEdit: (id: number, updatedData: { word: string; categories: string[]; videos: string[]; description: string; created_at: string }) => void;
+  onEdit: (id: number, poster: string, updatedData: { word: string; categories: string[]; videos: string[]; description: string; }) => void;
 }
 
 interface EditDictionaryItemComponentProps {
   item: EditDictionaryItemProps;
   onDelete: (id: number, poster: string) => void;
-  onEdit: (id: number, updatedData: { word: string; categories: string[]; videos: string[]; description: string; created_at: string }) => void;
+  onEdit: (id: number, poster: string, updatedData: { word: string; categories: string[]; videos: string[]; description: string; }) => void;
 }
 
 const EditDictionaryItem: React.FC<EditDictionaryItemComponentProps> = ({ item, onDelete, onEdit }) => {
   const { deleteDictionaryData } = useDeleteDictionaryData();
+  const { updateDictionaryData, responseMessage } = useUpdateDictionaryData();
 
   const parsedCategories: string[] = JSON.parse(item.category_json);
   const parsedImageUrls: string[] = JSON.parse(item.video_json);
@@ -32,8 +35,17 @@ const EditDictionaryItem: React.FC<EditDictionaryItemComponentProps> = ({ item, 
     });
   };
 
-  const handleEdit = (id: number, updatedData: { word: string; categories: string[]; videos: string[]; description: string; created_at: string }) => {
-    onEdit(id, updatedData);
+  const handleEdit = async (id: number, poster: string, updatedData: { word: string; categories: string[]; videos: string[]; description: string; }) => {
+    const updatedFormData: UpdateDictionaryItemProps = {
+      word: updatedData.word,
+      description: updatedData.description,
+      category_json: JSON.stringify(updatedData.categories.filter(category => category.trim() !== '')),
+      video_json: JSON.stringify(updatedData.videos.filter(video => video.trim() !== '')),
+    };
+    
+    await updateDictionaryData(id,poster,updatedFormData,() =>{
+      onEdit(id,poster,updatedData)
+    });
   };
 
   return (

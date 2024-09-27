@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { CognitoUserPool,CognitoUserSession } from 'amazon-cognito-identity-js';
-import useFetchAuthSession from '../hooks/useFetchAuthSession';
 import awsConfiguration from '../../../awsConfiguration';
 import endpoint from '../../../endpoint';
 import './EditAccordionPanel.css';
@@ -19,7 +18,7 @@ interface AccordionPanelProps {
   CreatedAt: string;
   Poster: string;
   onDelete: (id: number, poster: string) => void; 
-  onEdit: (id: number, updatedData: { word: string; categories: string[]; videos: string[]; description: string; created_at: string }) => void;
+  onEdit: (id: number, poster: string, updatedData: { word: string; categories: string[]; videos: string[]; description: string; }) => void;
 }
 
 const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categories, Videos, Description,CreatedAt,Poster, onDelete, onEdit }) => {
@@ -64,21 +63,6 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
     }
   };
 
-  const togglePanel = () => {
-    if (!isHovering) {
-      setIsOpen(!isOpen);
-      if (!isOpen) setResponseMessage(''); // パネルを閉じたときにメッセージを消去
-    }
-  };
-
-  // const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-  //   if (e.target instanceof HTMLTextAreaElement) {
-  //     e.target.style.height = 'auto'; 
-  //     e.target.style.height = `${e.target.scrollHeight}px`; 
-  //   }
-  //   setEditDescription(e.target.value);
-  // };
-
   const handleSave = async () => {
     const updatedData = {
       word: formData.word,
@@ -86,70 +70,21 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
       videos: editVideos,
       description: formData.description,
     };
-    try {
-      const cognitoUser = userPool.getCurrentUser();
-      if (cognitoUser) {
-        const session = await new Promise<CognitoUserSession>((resolve, reject) => {
-          cognitoUser.getSession((err: Error | null, session: CognitoUserSession | null) => {
-            if (err) {
-              reject(err);
-            } else if (session) {
-              resolve(session);
-            } else {
-              reject(new Error('Failed Get Session'));
-            }
-          });
-        });
-
-        if (session.isValid()) {
-          const cognitoSession = session.getAccessToken().getJwtToken();
-          const username = cognitoUser.getUsername();
-
-          const updatedFormData = {
-            word: updatedData.word,
-            description: updatedData.description,
-            category_json: JSON.stringify(editCategories.filter(category => category.trim() !== '')),
-            video_json: JSON.stringify(editVideos.filter(video => video.trim() !== '')),
-            poster: username,
-          };
-
-          const requestBody = {
-            action_user: username,
-            cognito_session: cognitoSession,
-            dictionary_word: updatedFormData,
-          };
-
-          const response = await fetch(endpoint + `/dev/dictionary/${ID}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session}`,
-              'x-processing-type1': 'dictionary_word',
-              'x-processing-type2': 'update_dictionary_word',
-            },
-            body: JSON.stringify(requestBody),
-          });
-
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error saving data', errorText);
-            throw new Error(`Error saving data: ${errorText}`);
-          }
-          console.log(updatedFormData)
-          setResponseMessage('Data saved successfully');
-        } else {
-          console.log('Session Is Not Valid');
-          setResponseMessage('Session is not valid');
-        }
-      } else {
-        console.log('No cognito user found');
-        setResponseMessage('No Cognito user found');
-      }
-    } catch (error) {
-      console.error('Failed to fetch', error);
-      setResponseMessage('Error: ' + error);
-    }
+    // onEdit(ID,Poster,updatedData);
     adjustContentHeight();
+  };
+
+  const togglePanel = () => {
+    if (!isHovering) {
+      setIsOpen(!isOpen);
+      if (!isOpen) setResponseMessage(''); // パネルを閉じたときにメッセージを消去
+    }
+  };
+
+  const handleEdit = () => {
+    adjustTextareaHeight();
+    setIsEditing(true);
+    setIsOpen(true); // Ensure the panel opens when editing starts
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -160,10 +95,12 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
     });
   };
 
-  const handleEdit = () => {
-    adjustTextareaHeight();
-    setIsEditing(true);
-    setIsOpen(true); // Ensure the panel opens when editing starts
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (e.target instanceof HTMLTextAreaElement) {
+      e.target.style.height = 'auto'; 
+      e.target.style.height = `${e.target.scrollHeight}px`; 
+    }
+    handleChange(e);
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
@@ -187,7 +124,11 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
   };
 
   const handleCancel = () => {
-    // Reset the values to their original state and exit edit mode
+    setFormData({
+      ...formData,
+      word:Word,
+      description:Description,
+    });
     setEditCategories(Categories);
     setEditVideos(Videos);
     setIsOpen(false);
@@ -250,7 +191,7 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
               <p className='p'>用語</p>
               <input className={'edit-dictionary-input'} type="text" name="word" value={formData.word} onChange={handleChange} placeholder="単語を入力" />
               <p className='p'>説明</p>
-              <textarea className={'edit-dictionary-input-description'} name="description" value={formData.description} onChange={handleChange} placeholder="説明を入力" />
+              <textarea className={'edit-dictionary-input-description'} name="description" value={formData.description} onChange={handleDescriptionChange} placeholder="説明を入力" />
               <p className='p'>カテゴリー</p>
               {editCategories.map((category, idx) => (
                 <input key={idx} type="text" value={category} onChange={(e) => handleCategoryChange(e, idx)} placeholder="カテゴリを入力" />
@@ -272,7 +213,7 @@ const EditAccordionPanel: React.FC<AccordionPanelProps> = ({ ID, Word, Categorie
           <>
             <p>{Description}</p>
             <div className='accordion-videos'>
-             { Videos.map((video, index) => (
+              { Videos.map((video, index) => (
               <div key={index} className="accordion-video">
                 {video && (
                   <iframe className="accordion-image" src={video} allow="fullscreen" title={`${Word}`} />
