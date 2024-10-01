@@ -113,7 +113,9 @@ functions:
           path: /files-upload
           method: get
           cors:
-            origin: "http://localhost:3000"  # フロントエンドのオリジン
+            origins:
+              - 'http://localhost:3000'
+              - 'https://staging.d1631t3ap8rd8k.amplifyapp.com'
             headers:
               - Content-Type
               - X-Amz-Date
@@ -206,7 +208,8 @@ resources:
         CorsConfiguration:
           CorsRules:
             - AllowedOrigins:
-                - "http://localhost:3000"  # フロントエンドからのオリジンを指定
+                - 'http://localhost:3000'  # フロントエンドからのオリジンを指定
+                - 'https://staging.d1631t3ap8rd8k.amplifyapp.com'
               AllowedMethods:
                 - GET
                 - PUT
@@ -214,7 +217,7 @@ resources:
                 - DELETE
                 - HEAD
               AllowedHeaders:
-                - "*"
+                - "Content-Type"
               MaxAge: 3000
     LambdaExecutionRole:
       Type: AWS::IAM::Role
@@ -236,6 +239,7 @@ resources:
                   Action:
                     - s3:PutObject
                     - s3:GetObject
+                    - s3:PutBucketPolicy
                   Resource: arn:aws:s3:::${self:provider.environment.BUCKET_NAME}/*
 
 plugins:

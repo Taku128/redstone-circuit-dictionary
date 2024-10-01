@@ -16,6 +16,17 @@ import (
 
 var s3Client *s3.Client
 
+// アクセス元のオリジンが許可されているか確認する
+func ConfirmAllowedOrigin(requestOrigin string) string {
+	allowedOrigins := util.GetSetting().AllowedOrigins
+	for _, allowedOrigin := range allowedOrigins {
+		if allowedOrigin == requestOrigin {
+			return requestOrigin
+		}
+	}
+	return ""
+}
+
 // 初期化処理
 func init() {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
@@ -43,6 +54,7 @@ func generatePresignedURL(fileName string) (string, error) {
 
 // Lambdaハンドラ
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	allowOrigin := ConfirmAllowedOrigin(request.Headers["origin"])
 	fileName := request.QueryStringParameters["filename"]
 	if fileName == "" {
 		return events.APIGatewayProxyResponse{
@@ -50,7 +62,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 			Body:       "Missing filename",
 			Headers: map[string]string{
 				"Content-Type":                 "application/json",
-				"Access-Control-Allow-Origin":  "http://localhost:3000",
+				"Access-Control-Allow-Origin":  allowOrigin,
 				"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
 				"Access-Control-Allow-Headers": "Content-Type, Authorization",
 			},
@@ -64,7 +76,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 			Body:       "Failed to generate presigned URL",
 			Headers: map[string]string{
 				"Content-Type":                 "application/json",
-				"Access-Control-Allow-Origin":  "http://localhost:3000",
+				"Access-Control-Allow-Origin":  allowOrigin,
 				"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
 				"Access-Control-Allow-Headers": "Content-Type, Authorization",
 			},
@@ -76,7 +88,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		Body:       fmt.Sprintf(`{"url": "%s"}`, url),
 		Headers: map[string]string{
 			"Content-Type":                 "application/json",
-			"Access-Control-Allow-Origin":  "http://localhost:3000",
+			"Access-Control-Allow-Origin":  allowOrigin,
 			"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
 			"Access-Control-Allow-Headers": "Content-Type, Authorization",
 		},

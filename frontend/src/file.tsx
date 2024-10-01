@@ -45,10 +45,9 @@ const FileUpload: React.FC = () => {
 
       await fetch(presignedUrl, {
         method: "PUT",
-        credentials: 'include',
+        // credentials: 'include',
         headers: {
           "Content-Type": selectedFile.type,
-          'Authorization': `Bearer ${session}`,
         },
         body: selectedFile,
       });
