@@ -4,6 +4,7 @@ type Setting struct {
 	AllowedOrigins      []string
 	AWSRegion           string
 	DictionaryWordTable DictionaryWordRepo
+	BucketName          string
 }
 
 type DictionaryWordRepo struct {
@@ -19,6 +20,7 @@ func GetSetting() *Setting {
 			TableName:   "dev-redstoneCircuitDictionary-words",
 			PosterIndex: "poster_index",
 		},
+		BucketName: "dev-redstone-circuit-dictionary-files",
 	}
 	return devSetting
 }

@@ -5,6 +5,7 @@ import { Amplify } from 'aws-amplify';
 import config from './awsConfiguration';
 import App from './App';
 import './index.css';
+import FileUpload from './file';
 
 interface AwsMobile {
   aws_project_region: string;

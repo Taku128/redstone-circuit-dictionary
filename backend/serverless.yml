@@ -8,6 +8,7 @@ provider:
     DYNAMODB_TABLE: ${opt:stage, 'dev'}-redstoneCircuitDictionary-words
     REGION: ${self:provider.region}
     COGNITO_POOL_ID: !Ref CognitoUserPool
+    BUCKET_NAME: ${opt:stage, 'dev'}-redstone-circuit-dictionary-files
   ecr:
     images:
       redstone-circuit-dictionary-https:
@@ -16,6 +17,9 @@ provider:
       redstone-circuit-dictionary-cognito:
         path: .
         file: docs/Dockerfile.cognito
+      redstone-circuit-dictionary-files:
+        path: .
+        file: docs/Dockerfile.s3
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -38,6 +42,11 @@ provider:
         - logs:CreateLogStream
         - logs:PutLogEvents
       Resource: "*"
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+      Resource: arn:aws:s3:::${self:provider.environment.BUCKET_NAME}/*
 
 functions:
   httpHandler:
@@ -96,6 +105,40 @@ functions:
           pool: ${opt:stage, 'dev'}-redstoneCircuitDictionary-userPool
           trigger: PreSignUp
           existing: true
+  http-S3:
+    image:
+      name: redstone-circuit-dictionary-files
+    events:
+      - http:
+          path: /files-upload
+          method: get
+          cors:
+            origins:
+              - 'http://localhost:3000'
+              - 'https://staging.d1631t3ap8rd8k.amplifyapp.com'
+            headers:
+              - "*"
+            allowCredentials: false
+          request:
+            parameters:
+              querystrings:
+                filename: true  # クエリパラメータでファイル名を指定
+      - http:
+          path: /files-download
+          method: get
+          cors:
+            origins:
+              - 'http://localhost:3000'
+              - 'https://staging.d1631t3ap8rd8k.amplifyapp.com'
+            headers:
+              - "*"
+            allowCredentials: false
+          request:
+            parameters:
+              querystrings:
+                filename: true
+    environment:
+      BUCKET_NAME: !Ref S3Bucket
 
 resources:
   Resources:
@@ -169,6 +212,46 @@ resources:
         SupportedIdentityProviders:
           - COGNITO
 
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.BUCKET_NAME}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - 'http://localhost:3000'  # フロントエンドからのオリジンを指定
+                - 'https://staging.d1631t3ap8rd8k.amplifyapp.com'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              AllowedHeaders:
+                - "Content-Type"
+              MaxAge: 3000
+    LambdaExecutionRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+              Action:
+                - sts:AssumeRole
+        Policies:
+          - PolicyName: S3AccessPolicy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:GetObject
+                  Resource: arn:aws:s3:::${self:provider.environment.BUCKET_NAME}/*
+
 plugins:
   - serverless-plugin-scripts
 
@@ -179,3 +262,4 @@ custom:
       before:deploy:deploy: |
         docker build -t redstone-circuit-dictionary-https -f ./docs/Dockerfile.https .
         docker build -t redstone-circuit-dictionary-cognito -f ./docs/Dockerfile.cognito . 
+        docker build -t redstone-circuit-dictionary-files -f ./docs/Dockerfile.s3 . 
