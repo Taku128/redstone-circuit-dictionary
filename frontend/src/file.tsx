@@ -1,26 +1,29 @@
-import { CognitoUserPool, CognitoUserSession } from "amazon-cognito-identity-js";
-import React, { useState, useEffect } from "react";
-import useFetchAuthSession from "./features/Dictionary/hooks/useFetchAuthSession";
-import awsConfiguration from "./awsConfiguration";
+import React, { useEffect, useState } from "react";
+import { CognitoUserPool,CognitoUserSession } from 'amazon-cognito-identity-js';
+import useFetchAuthSession from './features/Dictionary/hooks/useFetchAuthSession';
+import awsConfiguration from './awsConfiguration';
+import endpoint from "./endpoint";
+
 
 const userPool = new CognitoUserPool({
-    UserPoolId: awsConfiguration.UserPoolId,
-    ClientId: awsConfiguration.ClientId,
-  });
+  UserPoolId: awsConfiguration.UserPoolId,
+  ClientId: awsConfiguration.ClientId,
+});
 
 const FileUpload: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileUrl, setFileUrl] = useState("");
-  const [session, setSession] = useState<CognitoUserSession | null>(null);
+  const [fileName, setFileName] = useState("");
+  // const [session, setSession] = useState<CognitoUserSession | null>(null);
 
-    useEffect(() => {
-        const FetchSession = async () => {
-        const fetchedSession = await useFetchAuthSession(userPool);
-        setSession(fetchedSession);
-        };
-        
-        FetchSession();
-    }, []);
+  // useEffect(() => {
+  //   const FetchSession = async () => {
+  //     const fetchedSession = await useFetchAuthSession(userPool);
+  //     setSession(fetchedSession);
+  //   };
+    
+  //   FetchSession();
+  // }, []);
 
   // ファイルが選択されたときに呼び出される関数
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,29 +39,118 @@ const FileUpload: React.FC = () => {
       return;
     }
 
+    let username = '';
+    let cognitoSession = '';
+
+    const cognitoUser = userPool.getCurrentUser();
+    if (cognitoUser) {
+        try {
+          const session = await new Promise<CognitoUserSession>((resolve, reject) => {
+            cognitoUser.getSession((err: Error | null, session: CognitoUserSession | null) => {
+              if (err) {
+                reject(err);
+              } else if (session) {
+                resolve(session);
+              } else {
+                reject(new Error('Failed Get Session'));
+              }
+            });
+          });
+  
+          if (session.isValid()) {
+            cognitoSession = session.getAccessToken().getJwtToken();
+            username = cognitoUser.getUsername();
+          }
+          else {
+            console.log('Session Is Not Valid');
+            return;
+          }
+        } catch (error) {
+          console.error('Error getting user session', error);
+          return;
+        }
+      } 
+      if (!username){
+        console.log('No cognito user found');
+        return
+    }
+
     try {
-      const response = await fetch(
-        `https://b8fj8eos5m.execute-api.ap-northeast-1.amazonaws.com/dev/files-upload?filename=${selectedFile.name}`
-      );
+      const response = await fetch(endpoint + `/dev/files-upload?filename=${selectedFile.name}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `${cognitoSession}`,
+          'x-poster': `${username}`
+        }
+      });
       const data = await response.json();
       const presignedUrl = data.url;
 
       await fetch(presignedUrl, {
         method: "PUT",
-        // credentials: 'include',
         headers: {
           "Content-Type": selectedFile.type,
         },
         body: selectedFile,
       });
 
-      const uploadedFileUrl = presignedUrl.split("?")[0];
-      console.log(uploadedFileUrl);
-      setFileUrl(uploadedFileUrl);
+      setFileName(selectedFile.name)
       alert("ファイルがアップロードされました！");
     } catch (error) {
       console.error("アップロードエラー:", error);
       alert("ファイルのアップロードに失敗しました");
+    }
+  };
+
+  const handleFileDownload = async () => {
+    let username = '';
+    let cognitoSession = '';
+
+    const cognitoUser = userPool.getCurrentUser();
+    if (cognitoUser) {
+        try {
+          const session = await new Promise<CognitoUserSession>((resolve, reject) => {
+            cognitoUser.getSession((err: Error | null, session: CognitoUserSession | null) => {
+              if (err) {
+                reject(err);
+              } else if (session) {
+                resolve(session);
+              } else {
+                reject(new Error('Failed Get Session'));
+              }
+            });
+          });
+  
+          if (session.isValid()) {
+            cognitoSession = session.getAccessToken().getJwtToken();
+            username = cognitoUser.getUsername();
+          }
+          else {
+            console.log('Session Is Not Valid');
+            return;
+          }
+        } catch (error) {
+          console.error('Error getting user session', error);
+          return;
+        }
+      } 
+      if (!username){
+        console.log('No cognito user found');
+        return
+    }
+    
+    try {
+      const response = await fetch(endpoint + `/dev/files-download?filename=${fileName}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `${cognitoSession}`,
+          'x-poster': `${username}`
+        }
+      });
+      const data = await response.json();
+      setFileUrl(data.url);
+    } catch (error) {
+      console.error("Error fetching presigned URL:", error);
     }
   };
 
@@ -67,6 +159,7 @@ const FileUpload: React.FC = () => {
       <h1>ファイルアップロード</h1>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleFileUpload}>アップロード</button>
+      <button onClick={() => handleFileDownload()}>Download File</button>
       {fileUrl && (
         <div>
           <h2>アップロードされたファイル:</h2>

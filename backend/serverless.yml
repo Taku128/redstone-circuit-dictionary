@@ -8,7 +8,7 @@ provider:
     DYNAMODB_TABLE: ${opt:stage, 'dev'}-redstoneCircuitDictionary-words
     REGION: ${self:provider.region}
     COGNITO_POOL_ID: !Ref CognitoUserPool
-    BUCKET_NAME: ${opt:stage, 'dev'}-redstone-circuit-dictionary-files-upload
+    BUCKET_NAME: ${opt:stage, 'dev'}-redstone-circuit-dictionary-files
   ecr:
     images:
       redstone-circuit-dictionary-https:
@@ -17,7 +17,7 @@ provider:
       redstone-circuit-dictionary-cognito:
         path: .
         file: docs/Dockerfile.cognito
-      redstone-circuit-dictionary-files-upload:
+      redstone-circuit-dictionary-files:
         path: .
         file: docs/Dockerfile.s3
   iamRoleStatements:
@@ -107,7 +107,7 @@ functions:
           existing: true
   http-S3:
     image:
-      name: redstone-circuit-dictionary-files-upload
+      name: redstone-circuit-dictionary-files
     events:
       - http:
           path: /files-upload
@@ -117,15 +117,26 @@ functions:
               - 'http://localhost:3000'
               - 'https://staging.d1631t3ap8rd8k.amplifyapp.com'
             headers:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
+              - "*"
             allowCredentials: false
           request:
             parameters:
               querystrings:
                 filename: true  # クエリパラメータでファイル名を指定
+      - http:
+          path: /files-download
+          method: get
+          cors:
+            origins:
+              - 'http://localhost:3000'
+              - 'https://staging.d1631t3ap8rd8k.amplifyapp.com'
+            headers:
+              - "*"
+            allowCredentials: false
+          request:
+            parameters:
+              querystrings:
+                filename: true
     environment:
       BUCKET_NAME: !Ref S3Bucket
 
@@ -239,7 +250,6 @@ resources:
                   Action:
                     - s3:PutObject
                     - s3:GetObject
-                    - s3:PutBucketPolicy
                   Resource: arn:aws:s3:::${self:provider.environment.BUCKET_NAME}/*
 
 plugins:
@@ -252,4 +262,4 @@ custom:
       before:deploy:deploy: |
         docker build -t redstone-circuit-dictionary-https -f ./docs/Dockerfile.https .
         docker build -t redstone-circuit-dictionary-cognito -f ./docs/Dockerfile.cognito . 
-        docker build -t redstone-circuit-dictionary-files-upload -f ./docs/Dockerfile.s3 . 
+        docker build -t redstone-circuit-dictionary-files -f ./docs/Dockerfile.s3 . 

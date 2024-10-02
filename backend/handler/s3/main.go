@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
+	"example.com/hello-world/domain/cognito"
 	"example.com/hello-world/util"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -15,6 +17,19 @@ import (
 )
 
 var s3Client *s3.Client
+
+func CreateResponse(statusCode int, body, allowedOrigin string) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{
+		StatusCode: statusCode,
+		Headers: map[string]string{
+			"Content-Type":                 "application/json",
+			"Access-Control-Allow-Origin":  allowedOrigin,
+			"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+			"Access-Control-Allow-Headers": "Content-Type, Authorization",
+		},
+		Body: body,
+	}
+}
 
 // アクセス元のオリジンが許可されているか確認する
 func ConfirmAllowedOrigin(requestOrigin string) string {
@@ -38,7 +53,7 @@ func init() {
 }
 
 // プリサインドURLを生成する関数
-func generatePresignedURL(fileName string) (string, error) {
+func generatePresignedPUTURL(fileName string) (string, error) {
 	presignClient := s3.NewPresignClient(s3Client)
 
 	req, err := presignClient.PresignPutObject(context.TODO(), &s3.PutObjectInput{
@@ -52,47 +67,52 @@ func generatePresignedURL(fileName string) (string, error) {
 	return req.URL, nil
 }
 
+func generatePresignedGETURL(fileName string) (string, error) {
+	presignClient := s3.NewPresignClient(s3Client)
+
+	req, err := presignClient.PresignGetObject(context.TODO(), &s3.GetObjectInput{
+		Bucket: aws.String(util.GetSetting().BucketName),
+		Key:    aws.String(fileName),
+	}, s3.WithPresignExpires(15*time.Minute)) // URLの有効期限は15分
+
+	if err != nil {
+		return "", fmt.Errorf("failed to generate presigned URL: %w", err)
+	}
+	return req.URL, nil
+}
+
 // Lambdaハンドラ
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	allowOrigin := ConfirmAllowedOrigin(request.Headers["origin"])
+
+	err := cognito.ConfirmUser(request.Headers["x-poster"], request.Headers["Authorization"])
+	if err != nil {
+		return CreateResponse(http.StatusUnauthorized, err.Error(), allowOrigin), nil
+	}
+
 	fileName := request.QueryStringParameters["filename"]
 	if fileName == "" {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Body:       "Missing filename",
-			Headers: map[string]string{
-				"Content-Type":                 "application/json",
-				"Access-Control-Allow-Origin":  allowOrigin,
-				"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-				"Access-Control-Allow-Headers": "Content-Type, Authorization",
-			},
-		}, nil
+		return CreateResponse(http.StatusBadRequest, "Missing filename", allowOrigin), nil
 	}
 
-	url, err := generatePresignedURL(fileName)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       "Failed to generate presigned URL",
-			Headers: map[string]string{
-				"Content-Type":                 "application/json",
-				"Access-Control-Allow-Origin":  allowOrigin,
-				"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-				"Access-Control-Allow-Headers": "Content-Type, Authorization",
-			},
-		}, nil
-	}
+	switch request.Path {
+	case "/files-upload":
+		url, err := generatePresignedPUTURL(fileName)
+		if err != nil {
+			return CreateResponse(http.StatusInternalServerError, "Failed to generate presigned put URL", allowOrigin), nil
+		}
+		return CreateResponse(http.StatusOK, fmt.Sprintf(`{"url": "%s"}`, url), allowOrigin), nil
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Body:       fmt.Sprintf(`{"url": "%s"}`, url),
-		Headers: map[string]string{
-			"Content-Type":                 "application/json",
-			"Access-Control-Allow-Origin":  allowOrigin,
-			"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-			"Access-Control-Allow-Headers": "Content-Type, Authorization",
-		},
-	}, nil
+	case "/files-download":
+		url, err := generatePresignedGETURL(fileName)
+		if err != nil {
+			return CreateResponse(http.StatusInternalServerError, "Failed to generate presigned get URL", allowOrigin), nil
+		}
+		return CreateResponse(http.StatusOK, fmt.Sprintf(`{"url": "%s"}`, url), allowOrigin), nil
+
+	default:
+		return CreateResponse(http.StatusBadRequest, "invalid request path", allowOrigin), nil
+	}
 }
 
 func main() {

@@ -20,7 +20,7 @@ func GetSetting() *Setting {
 			TableName:   "dev-redstoneCircuitDictionary-words",
 			PosterIndex: "poster_index",
 		},
-		BucketName: "dev-redstoneCircuitDictionary-files-upload",
+		BucketName: "dev-redstone-circuit-dictionary-files",
 	}
 	return devSetting
 }
