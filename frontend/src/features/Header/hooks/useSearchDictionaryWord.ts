@@ -14,7 +14,7 @@ const useSearchDictionaryWord = () => {
     e.preventDefault();
     
     // クエリが空白の場合、空の結果でホームページに遷移
-    if (!searchQuery.trim()) return navigate('/', { state: { results: [], query: '' } });
+    if (!searchQuery.trim()) return navigate('/Dictonary', { state: { results: [], query: '' } });
 
     try {
       // 指定されたAPIエンドポイントにGETリクエストを送信し、検索結果を取得
@@ -28,10 +28,10 @@ const useSearchDictionaryWord = () => {
       });
       const data = await response.json();
       // 取得したデータとクエリをナビゲート先に渡す
-      navigate('/', { state: { results: data, query: searchQuery } });
+      navigate('/Dictonary', { state: { results: data, query: searchQuery } });
     } catch (error) {
       // エラー時にはエラーメッセージを含んだ空の結果をナビゲート先に渡す
-      navigate('/', { state: { results: [], query: searchQuery, error: 'Error fetching search results' } });
+      navigate('/Dictonary', { state: { results: [], query: searchQuery, error: 'Error fetching search results' } });
     }
   };
 

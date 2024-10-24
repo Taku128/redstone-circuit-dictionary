@@ -1,0 +1,31 @@
+.Community {
+    text-align: center; 
+    padding: 20px; 
+}
+
+.community-list {
+    display: flex; 
+    flex-direction: column; 
+    text-align: left; 
+}
+
+.community-item {
+    border: 1px solid #ccc; 
+    padding: 20px; 
+    margin: 10px; 
+    width: 80%; 
+    text-align: left; 
+}
+
+.community-list-h2 {
+    margin-top: 10px; 
+    padding: 0.8rem 0; 
+    margin-bottom: 0.2rem; 
+    background-image: linear-gradient(90deg, #d73928 0 25%, #8c0100 25%); 
+    background-repeat: no-repeat; 
+    background-size: 100% 10%; 
+    background-position: bottom; 
+    color: #323232; 
+    font-weight: bold; 
+    font-size: 2em; 
+}

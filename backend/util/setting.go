@@ -4,11 +4,25 @@ type Setting struct {
 	AllowedOrigins      []string
 	AWSRegion           string
 	DictionaryWordTable DictionaryWordRepo
+<<<<<<< Updated upstream
+=======
+	CommunityTable      CommunityRepo
+	MessageTable        MessageRepo
+	BucketName          string
+>>>>>>> Stashed changes
 }
 
 type DictionaryWordRepo struct {
 	TableName   string
 	PosterIndex string
+}
+
+type CommunityRepo struct {
+	TableName string
+}
+
+type MessageRepo struct {
+	TableName string
 }
 
 func GetSetting() *Setting {
@@ -19,6 +33,13 @@ func GetSetting() *Setting {
 			TableName:   "dev-redstoneCircuitDictionary-words",
 			PosterIndex: "poster_index",
 		},
+		CommunityTable: CommunityRepo{
+			TableName: "dev-redstoneCircuitDictionary-cummunities",
+		},
+		MessageTable: MessageRepo{
+			TableName: "dev-redstoneCircuitDictionary-messages",
+		},
+		BucketName: "dev-redstone-circuit-dictionary-files",
 	}
 	return devSetting
 }
