@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"example.com/hello-world/util"
@@ -59,6 +60,10 @@ func (h *HeaderConfig) HandleRequest(ctx context.Context, request events.APIGate
 	switch h.ProcessingType1 {
 	case "dictionary_word":
 		return h.DictionaryWord(ctx, request)
+	case "community":
+		return h.Community(ctx, request)
+	case "message":
+		return h.Message(ctx, request)
 
 	default:
 		return http.StatusBadRequest, "invalid processing type1", nil
@@ -68,6 +73,10 @@ func (h *HeaderConfig) HandleRequest(ctx context.Context, request events.APIGate
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	headerConfig := HeaderConfig{}
 	statusCode, body, err := headerConfig.HandleRequest(ctx, request)
+	log.Printf("x-processing-type1 = %s,\tx-processing-type2 = %s", headerConfig.ProcessingType1, headerConfig.ProcessingType2)
+	if err != nil {
+		log.Printf("error :=%s", err.Error())
+	}
 	return headerConfig.CreateResponse(statusCode, body), err
 }
 

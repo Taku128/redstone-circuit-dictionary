@@ -1,0 +1,19 @@
+.community-home { 
+    display: grid; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.community-title-text-center { 
+    padding-top: 20px; 
+    padding-bottom: 40px; 
+    font-family: "Ubuntu", sans-serif; 
+    text-align: center; 
+}
+
+.font-ubuntu-medium { 
+    font-family: "Ubuntu", sans-serif; 
+    font-weight: bold; 
+    font-size: 2.2em; 
+    color: #1d1c1c; 
+}

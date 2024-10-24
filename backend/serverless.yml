@@ -5,7 +5,9 @@ provider:
   region: ap-northeast-1
   stage: ${opt:stage, 'dev'}
   environment:
-    DYNAMODB_TABLE: ${opt:stage, 'dev'}-redstoneCircuitDictionary-words
+    DictionaryTABLE: ${opt:stage, 'dev'}-redstoneCircuitDictionary-words
+    CommunityTABLE: ${opt:stage, 'dev'}-redstoneCircuitDictionary-cummunities
+    MessageTABLE: ${opt:stage, 'dev'}-redstoneCircuitDictionary-messages
     REGION: ${self:provider.region}
     COGNITO_POOL_ID: !Ref CognitoUserPool
   ecr:
@@ -26,8 +28,10 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
-        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/poster_index"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DictionaryTABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DictionaryTABLE}/index/poster_index"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CommunityTABLE}"
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.MessageTABLE}"
     - Effect: Allow
       Action:
         - cognito-idp:AdminConfirmSignUp
@@ -87,7 +91,9 @@ functions:
               - x-processing-type2
             allowCredentials: true
     environment:
-      DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
+      DictionaryTABLE: ${self:provider.environment.DictionaryTABLE}
+      CommunityTABLE: ${self:provider.environment.CommunityTABLE}
+      MessageTABLE: ${self:provider.environment.MessageTABLE}
   confirmSignUp:
     image:
         name: redstone-circuit-dictionary-cognito
@@ -102,7 +108,7 @@ resources:
     DynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        TableName: ${self:provider.environment.DictionaryTABLE}
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: N
@@ -125,6 +131,36 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    DynamoDBCommunityTABLE:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${self:provider.environment.CommunityTABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    DynamoDBMessageTABLE:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${self:provider.environment.MessageTABLE}
+        AttributeDefinitions:
+          - AttributeName: community_id
+            AttributeType: N
+          - AttributeName: user_name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: community_id
+            KeyType: HASH
+          - AttributeName: user_name
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
